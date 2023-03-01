@@ -27,6 +27,9 @@ for experiment in opt.get_experiments():
     experiment.log_parameter("task", args.task)
     experiment.log_parameter("model", args.model)
     experiment.log_parameter("epochs", 10)
+    # experiment.log_parameter("workers", 10)
+    # experiment.log_parameter("max_queue_size", 10)
+    experiment.log_parameter("use_multiprocessing", "False")
     gen_train, gen_val, gen_test = utils.setup_generators(experiment, args.task)
 
     # Build the model:

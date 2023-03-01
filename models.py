@@ -18,9 +18,9 @@ def znorm(x):
 
 class SRResNet():
     config = {
-            "algorithm": "grid",
+            "algorithm": "random",
             "name": "SRResNet",
-            "spec": {"maxCombo": 20, "objective": "minimize", "metric": "val_loss"},
+            "spec": {"maxCombo": 52, "objective": "minimize", "metric": "val_loss"},
             "parameters": {
                 # "first_layer_units": {
                 #     "type": "integer",
@@ -35,7 +35,6 @@ class SRResNet():
                 # "batch_size": {"type": "discrete", "values": [4, 8]},
                  "workers": {"type": "discrete", "values": [1, 2, 4, 6, 8, 12, 16, 20]},
                  "max_queue_size": {"type": "discrete", "values": [2, 4, 8, 16, 32, 64, 128]},
-                 "use_multiprocessing": {"type": "categorical", "values": ["True", "False"]},
             },
             "trials": 1,
         }
