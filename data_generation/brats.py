@@ -11,6 +11,11 @@ import matplotlib.pyplot as plt
 import sys
 import shutil
 
+def znorm(img):
+    img = img - np.mean(img)
+    img = img / np.std(img)
+    return img
+
 dataset = '/mnt/f4616a95-e470-4c0f-a21e-a75a8d283b9e/RAW/brats_mixed/'
 target_dir = '/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/DS0061/'
 
@@ -50,9 +55,9 @@ for patient in patients:
             labels_slice = np.array(cv2.resize(labels[:, :, slc_idx], dsize=(img_size, img_size), interpolation=cv2.INTER_NEAREST) > 0, dtype=np.bool)
 
             np.savez(save_path + patient + '_' + str(slc),
-                     flair=np.interp(flair_slice, (flair_slice.min(), flair_slice.max()), (0, 255)).astype(np.uint8),
-                     t2=np.interp(t2_slice, (t2_slice.min(), t2_slice.max()), (0, 255)).astype(np.uint8),
-                     t1=np.interp(t1_slice, (t1_slice.min(), t1_slice.max()), (0, 255)).astype(np.uint8),
-                     t1ce=np.interp(t1ce_slice, (t1ce_slice.min(), t1ce_slice.max()), (0, 255)).astype(np.uint8),
+                     flair=znorm(flair_slice),
+                     t2=znorm(t2_slice),
+                     t1=znorm(t1_slice),
+                     t1ce=znorm(t1ce_slice),
                      mask=labels_slice)
             slc += 1
