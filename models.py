@@ -152,9 +152,9 @@ class SRResNet():
         model = Model(input, output)
         if (experiment.get_parameter("optimizer") == "Adam"): # "Adam", "SGD", "RMSprop"
             model.compile(optimizer=Adam(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
-        else if (experiment.get_parameter("optimizer") == "SGD"):
+        elif (experiment.get_parameter("optimizer") == "SGD"):
             model.compile(optimizer=SGD(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
-        else if (experiment.get_parameter("optimizer") == "RMSprop"):
+        elif (experiment.get_parameter("optimizer") == "RMSprop"):
             model.compile(optimizer=SGD(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
             
         return model
