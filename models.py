@@ -154,9 +154,14 @@ class SRResNet():
 
     def train(experiment, model, gen_train, gen_val):
         from tensorflow.keras.utils import OrderedEnqueuer
+        from tensorflow.config.experimental import get_device_details, get_memory_info
+        from tensorflow.config import list_physical_devices
         import numpy as np
         import utils
-
+        
+        if (utils.memory_check(experiment, model) == False):
+            val_score = utils.evaluate(experiment, model, gen_val, "val")
+            return
         tr_seq = OrderedEnqueuer(gen_train, use_multiprocessing=False)
         min_loss = np.inf
         patience = 0

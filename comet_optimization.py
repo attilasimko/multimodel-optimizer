@@ -35,6 +35,7 @@ for experiment in opt.get_experiments():
     else:
         raise Exception("Unknown model")
 
+
     # Train the model:
     if (args.model == "srresnet"):
         models.SRResNet.train(experiment, model, gen_train, gen_val)
