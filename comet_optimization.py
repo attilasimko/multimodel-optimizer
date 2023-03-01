@@ -14,10 +14,17 @@ if (args.model == "srresnet"):
     config = models.SRResNet.config
 opt = comet_ml.Optimizer(config)
 
-if (args.task == "sct"):
-    data_path = '/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/DS0060/'
-else:
-    raise Exception("Unknown task")
+if (args.server is None):
+    if (args.task == "sct"):
+        data_path = '/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/DS0060/'
+    else:
+        raise Exception("Unknown task")
+elif (args.server == "laplace"):
+    if (args.task == "sct"):
+        data_path = '/data/attila/DS0060/'
+    else:
+        raise Exception("Unknown task")
+
 
 experiment_idx = 0
 for experiment in opt.get_experiments():
