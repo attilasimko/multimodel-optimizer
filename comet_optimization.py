@@ -3,11 +3,12 @@ import models
 import utils
 import argparse
 import os
+import time
 comet_ml.init(api_key="ro9UfCMFS2O73enclmXbXfJJj", project_name='comet-optimizer')
 
 parser = argparse.ArgumentParser(description='Welcome.')
 parser.add_argument("--gpu", default=None)
-parser.add_argument("--task", default="sct") # sct / denoise / transfer
+parser.add_argument("--task", default="sct") # sct / denoise / transfer / time
 parser.add_argument("--model", default="srresnet") # srresnet / pix2pix / diffusion
 args = parser.parse_args()
 
@@ -35,13 +36,16 @@ for experiment in opt.get_experiments():
     else:
         raise Exception("Unknown model")
 
+    tic = time.perf_counter()
     # Train the model:
     if (args.model == "srresnet"):
         models.SRResNet.train(experiment, model, args.task, gen_train, gen_val)
     else:
         raise Exception("Unknown model")
+    toc = time.perf_counter()
+    experiment.log_metrics({"val_loss": toc - tic})
 
     # How well did it do?
-    utils.plot_results(experiment, model, gen_val)
-    utils.evaluate(experiment, model, gen_test, "test", args.task)
+    # utils.plot_results(experiment, model, gen_val)
+    # utils.evaluate(experiment, model, gen_test, "test", args.task)
     experiment.end()
