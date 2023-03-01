@@ -154,7 +154,7 @@ class SRResNet():
             tr_seq.start(workers=4, max_queue_size=10)
             data_seq = tr_seq.get()
             train_loss = []
-            for idx in range(int(len(gen_train))):
+            for idx in range(1):#int(len(gen_train))):
                 x_mri, x_ct = next(data_seq)
                 gan_loss = model.train_on_batch(x_mri, x_ct)
                 train_loss.append(gan_loss)
