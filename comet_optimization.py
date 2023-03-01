@@ -6,6 +6,7 @@ import argparse
 comet_ml.init(api_key="ro9UfCMFS2O73enclmXbXfJJj", project_name='comet-optimizer')
 
 parser = argparse.ArgumentParser(description='Welcome.')
+parser.add_argument("--server", default=None) # sct / denoise / segment
 parser.add_argument("--task", default="sct") # sct / denoise / segment
 parser.add_argument("--model", default="srresnet") # srresnet / pix2pix / diffusion
 args = parser.parse_args()
@@ -30,6 +31,7 @@ experiment_idx = 0
 for experiment in opt.get_experiments():
     experiment.set_name(f"{args.task}_{args.model}_{experiment_idx}")
     experiment_idx += 1
+    experiment.log_parameter("server", args.server)
     experiment.log_parameter("task", args.task)
     experiment.log_parameter("model", args.model)
     gen_train, gen_val, gen_test = utils.setup_generators(experiment, data_path)
