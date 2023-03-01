@@ -28,13 +28,14 @@ def memory_check(experiment, model):
     deviceCount = nvidia_smi.nvmlDeviceGetCount()
     handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
     info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
-    available_memory = np.round(info.free / (1024.0 ** 3), 3)
+    available_memory = np.round(info.total / (1024.0 ** 3), 3)
     nvidia_smi.nvmlShutdown()
 
     required_memory = get_TF_memory_usage(experiment.get_parameter("batch_size"), model) 
     experiment.log_parameter("reqmemory", required_memory)
 
     if (required_memory > available_memory):
+        print(f"ERROR: Not enough memory. Required: {required_memory} GB, Available: {available_memory} GB")
         return False
     return True
 
