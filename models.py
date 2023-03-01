@@ -164,12 +164,12 @@ class SRResNet():
         if (utils.memory_check(experiment, model) == False):
             val_score = utils.evaluate(experiment, model, gen_val, "val")
             return
-        tr_seq = OrderedEnqueuer(gen_train, use_multiprocessing=False)
+        tr_seq = OrderedEnqueuer(gen_train, use_multiprocessing=True)
         min_loss = np.inf
         patience = 0
         patience_thr = 5
         for epoch in range(experiment.get_parameter("epochs")):
-            tr_seq.start(workers=4, max_queue_size=10)
+            tr_seq.start(workers=2, max_queue_size=20)
             data_seq = tr_seq.get()
             train_loss = []
             for idx in range(int(len(gen_train))):

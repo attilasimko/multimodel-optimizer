@@ -102,8 +102,8 @@ def evaluate(experiment, model, gen, eval_type):
     import numpy as np
     from tensorflow.keras.utils import OrderedEnqueuer
     
-    test_seq = OrderedEnqueuer(gen, use_multiprocessing=False)
-    test_seq.start(workers=4, max_queue_size=10)
+    test_seq = OrderedEnqueuer(gen, use_multiprocessing=True)
+    test_seq.start(workers=2, max_queue_size=20)
     data_seq = test_seq.get()
     loss_list = []
     for idx in range(int(len(gen))):
