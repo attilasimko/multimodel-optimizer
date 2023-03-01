@@ -1,7 +1,7 @@
 def setup_generators(experiment, task):
     import data
     data_path = get_dataset_path(experiment, task)
-    
+
     gen_train = data.DataGenerator(data_path + "training/",
                             inputs=[['mr', False, 'float32']],
                             outputs=[['ct', False, 'float32']],
@@ -25,14 +25,14 @@ def get_dataset_path(experiment, task):
     if (os.path.isdir('/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/')): # If running on my local machine
         data_path = '/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/'
         if (task == "sct"):
-            data_path += 'DS0060'
+            data_path += 'DS0060/'
         else:
             raise Exception("Unknown task")
         experiment.log_parameter("server", "GERTY")
     elif (os.path.isdir('/data/attila/')): # If running on laplace / gauss / neumann
         data_path = '/data/attila/'
         if (task == "sct"):
-            data_path += 'DS0060'
+            data_path += 'DS0060/'
         else:
             raise Exception("Unknown task")
         experiment.log_parameter("server", "cluster")
