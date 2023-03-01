@@ -2,14 +2,12 @@ import torch
 import torch.nn as nn
 import math
 
-
 def sct_range(x):
     import tensorflow
     from tensorflow.keras import backend as K
     x = tensorflow.where(K.greater_equal(x, -1), x, -1 * K.ones_like(x))
     x = tensorflow.where(K.less_equal(x, 1), x, 1 * K.ones_like(x))
     return x
-
 
 def znorm(x):
     import tensorflow
@@ -20,8 +18,8 @@ def znorm(x):
 
 class SRResNet():
     config = {
-            "algorithm": "grid",
-            "name": "Optimize MNIST Network",
+            "algorithm": "bayes",
+            "name": "SRResNet",
             "spec": {"maxCombo": 20, "objective": "minimize", "metric": "val_loss"},
             "parameters": {
                 # "first_layer_units": {
@@ -30,10 +28,11 @@ class SRResNet():
                 #     "sigma": 50,
                 #     "scalingType": "normal",
                 # },
+                "optimizer": {"type": "discrete", "values": ["Adam", "SGD", "RMSprop"]},
                 "learning_rate": {"type": "discrete", "values": [0.001, 0.0001, 0.00001]},
-                "num_filters": {"type": "discrete", "values": [16, 32, 64]},
-                "dropout_rate": {"type": "discrete", "values": [0.0, 0.2, 0.4]},
-                "batch_size": {"type": "discrete", "values": [4, 6]},
+                "num_filters": {"type": "integer", "min": 32, "max": 64},
+                "dropout_rate": {"type": "float", "min": 0.0, "max": 0.6},
+                "batch_size": {"type": "discrete", "values": [4, 8]},
             },
             "trials": 1,
         }
@@ -43,7 +42,7 @@ class SRResNet():
         Flatten, BatchNormalization, AveragePooling2D, Dense, Activation, Add , Concatenate, add, LeakyReLU
         from tensorflow.keras.models import Model
         from tensorflow.keras import activations
-        from tensorflow.keras.optimizers import Adam
+        from tensorflow.keras.optimizers import Adam, SGD, RMSprop
         from tensorflow.keras.callbacks import EarlyStopping
         from tensorflow.keras.regularizers import l2
         from tensorflow.keras.activations import softmax
@@ -151,7 +150,13 @@ class SRResNet():
             output = Activation(znorm)(output)
 
         model = Model(input, output)
-        model.compile(optimizer=Adam(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
+        if (experiment.get_parameter("optimizer") == "Adam"): # "Adam", "SGD", "RMSprop"
+            model.compile(optimizer=Adam(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
+        else if (experiment.get_parameter("optimizer") == "SGD"):
+            model.compile(optimizer=SGD(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
+        else if (experiment.get_parameter("optimizer") == "RMSprop"):
+            model.compile(optimizer=SGD(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
+            
         return model
 
     def train(experiment, model, gen_train, gen_val):
