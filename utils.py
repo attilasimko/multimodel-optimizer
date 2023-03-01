@@ -103,7 +103,7 @@ def evaluate(experiment, model, gen, eval_type):
     for idx in range(int(len(gen))):
         x_mri, x_ct = next(data_seq)
         pred = model.predict_on_batch(x_mri)
-        loss = np.abs(pred - x_ct)[x_ct>-1]
+        loss = 1000 * np.abs(pred - x_ct)[x_ct>-1]
         loss_list.append(loss)
 
     experiment.log_metrics({eval_type + "_loss": np.mean(loss_list)})
