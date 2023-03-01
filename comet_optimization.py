@@ -6,8 +6,8 @@ import os
 comet_ml.init(api_key="ro9UfCMFS2O73enclmXbXfJJj", project_name='comet-optimizer')
 
 parser = argparse.ArgumentParser(description='Welcome.')
-parser.add_argument("--gpu", default=None) # sct / denoise / segment
-parser.add_argument("--task", default="sct") # sct / denoise / segment
+parser.add_argument("--gpu", default=None)
+parser.add_argument("--task", default="sct") # sct / denoise / transfer
 parser.add_argument("--model", default="srresnet") # srresnet / pix2pix / diffusion
 args = parser.parse_args()
 
@@ -31,10 +31,9 @@ for experiment in opt.get_experiments():
     # Build the model:
     if (args.model == "srresnet"):
         # model = models._SRResNet(experiment)
-        model = models.SRResNet.build_TF_SRResNet(experiment)
+        model = models.SRResNet.build_TF_SRResNet(experiment, args.task)
     else:
         raise Exception("Unknown model")
-
 
     # Train the model:
     if (args.model == "srresnet"):

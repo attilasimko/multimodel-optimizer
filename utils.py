@@ -1,20 +1,26 @@
 def setup_generators(experiment, task):
     import data
     data_path = get_dataset_path(experiment, task)
+    if (task == "sct"):
+        input = "mr"
+        output = "ct"
+    if (task == "transfer"):
+        input = "t1"
+        output = "t1ce"
 
     gen_train = data.DataGenerator(data_path + "training/",
-                            inputs=[['mr', False, 'float32']],
-                            outputs=[['ct', False, 'float32']],
+                            inputs=[[input, False, 'float32']],
+                            outputs=[[output, False, 'float32']],
                             batch_size=experiment.get_parameter("batch_size"),
                             shuffle=True)
     gen_val = data.DataGenerator(data_path + "validating/",
-                            inputs=[['mr', False, 'float32']],
-                            outputs=[['ct', False, 'float32']],
+                            inputs=[[input, False, 'float32']],
+                            outputs=[[output, False, 'float32']],
                             batch_size=experiment.get_parameter("batch_size"),
                             shuffle=False)
     gen_test = data.DataGenerator(data_path + "testing/",
-                            inputs=[['mr', False, 'float32']],
-                            outputs=[['ct', False, 'float32']],
+                            inputs=[[input, False, 'float32']],
+                            outputs=[[output, False, 'float32']],
                             batch_size=experiment.get_parameter("batch_size"),
                             shuffle=False)
     
@@ -78,18 +84,18 @@ def get_dataset_path(experiment, task):
     import os
     if (os.path.isdir('/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/')): # If running on my local machine
         data_path = '/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/'
-        if (task == "sct"):
-            data_path += 'DS0060/'
-        else:
-            raise Exception("Unknown task")
         experiment.log_parameter("server", "GERTY")
     elif (os.path.isdir('/data/attila/')): # If running on laplace / gauss / neumann
         data_path = '/data/attila/'
-        if (task == "sct"):
-            data_path += 'DS0060/'
-        else:
-            raise Exception("Unknown task")
         experiment.log_parameter("server", "cluster")
+
+    if (task == "sct"):
+        data_path += 'DS0060/'
+    elif (task == "transfer"):
+        data_path += 'DS0061/'
+    else:
+        raise Exception("Unknown task")
+    
     return data_path
     
 def evaluate(experiment, model, gen, eval_type):

@@ -3,6 +3,20 @@ import torch.nn as nn
 import math
 
 
+def sct_range(x):
+    import tensorflow
+    from tensorflow.keras import backend as K
+    x = tensorflow.where(K.greater_equal(x, -1), x, -1 * K.ones_like(x))
+    x = tensorflow.where(K.less_equal(x, 1), x, 1 * K.ones_like(x))
+    return x
+
+
+def znorm(x):
+    import tensorflow
+    import tensorflow.keras.backend as K
+    t_mean = K.mean(x, axis=(1, 2, 3))
+    t_std = K.std(x, axis=(1, 2, 3))
+    return tensorflow.math.divide_no_nan(x - t_mean[:, None, None, None], t_std[:, None, None, None])
 
 class SRResNet():
     config = {
@@ -24,7 +38,7 @@ class SRResNet():
             "trials": 1,
         }
 
-    def build_TF_SRResNet(experiment):
+    def build_TF_SRResNet(experiment, task):
         from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, ZeroPadding2D, Dropout,\
         Flatten, BatchNormalization, AveragePooling2D, Dense, Activation, Add , Concatenate, add, LeakyReLU
         from tensorflow.keras.models import Model
@@ -131,6 +145,10 @@ class SRResNet():
         x = Conv2D(num_filters, kernel_size=3, padding='same', activation='relu')(x)
 
         output = Conv2D(1, kernel_size=1, padding='same')(x)
+        if (task == "sct"):
+            output = Activation(sct_range)(output)
+        elif (task == "transfer"):
+            output = Activation(znorm)(output)
 
         model = Model(input, output)
         model.compile(optimizer=Adam(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
