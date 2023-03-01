@@ -48,16 +48,19 @@ for patient in patients:
 
         slc = 0
         for slc_idx in range(2, np.shape(labels)[-1] - 4, 1):
-            flair_slice = np.array(cv2.resize(flair[:, :, slc_idx] / np.max(flair[:, :, slc_idx]), dsize=(img_size, img_size)), dtype=np.single)
-            t2_slice = np.array(cv2.resize(t2[:, :, slc_idx] / np.max(t2[:, :, slc_idx]), dsize=(img_size, img_size)), dtype=np.single)
-            t1_slice = np.array(cv2.resize(t1[:, :, slc_idx] / np.max(t1[:, :, slc_idx]), dsize=(img_size, img_size)), dtype=np.single)
-            t1ce_slice = np.array(cv2.resize(t1ce[:, :, slc_idx] / np.max(t1ce[:, :, slc_idx]), dsize=(img_size, img_size)), dtype=np.single)
+            flair_slice = znorm(np.array(cv2.resize(flair[:, :, slc_idx] / np.max(flair[:, :, slc_idx]), dsize=(img_size, img_size)), dtype=np.single))
+            t2_slice = znorm(np.array(cv2.resize(t2[:, :, slc_idx] / np.max(t2[:, :, slc_idx]), dsize=(img_size, img_size)), dtype=np.single))
+            t1_slice = znorm(np.array(cv2.resize(t1[:, :, slc_idx] / np.max(t1[:, :, slc_idx]), dsize=(img_size, img_size)), dtype=np.single))
+            t1ce_slice = znorm(np.array(cv2.resize(t1ce[:, :, slc_idx] / np.max(t1ce[:, :, slc_idx]), dsize=(img_size, img_size)), dtype=np.single))
             labels_slice = np.array(cv2.resize(labels[:, :, slc_idx], dsize=(img_size, img_size), interpolation=cv2.INTER_NEAREST) > 0, dtype=np.bool)
 
+            if (np.isnan(flair_slice * t2_slice * t1_slice * t1ce_slice).any()):
+                continue
+
             np.savez(save_path + patient + '_' + str(slc),
-                     flair=znorm(flair_slice),
-                     t2=znorm(t2_slice),
-                     t1=znorm(t1_slice),
-                     t1ce=znorm(t1ce_slice),
+                     flair=flair_slice,
+                     t2=t2_slice,
+                     t1=t1_slice,
+                     t1ce=t1ce_slice,
                      mask=labels_slice)
             slc += 1
