@@ -19,13 +19,12 @@ def setup_generators(experiment, task):
                             shuffle=False)
     
     return gen_train, gen_val, gen_test
+
 def memory_check(experiment, model):
     import nvidia_smi
     import numpy as np
 
     nvidia_smi.nvmlInit()
-
-    deviceCount = nvidia_smi.nvmlDeviceGetCount()
     handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
     info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
     available_memory = np.round(info.total / (1024.0 ** 3), 3)
@@ -103,7 +102,8 @@ def evaluate(experiment, model, gen, eval_type):
     loss_list = []
     for idx in range(int(len(gen))):
         x_mri, x_ct = next(data_seq)
-        loss = model.test_on_batch(x_mri, x_ct)
+        pred = model.predict_on_batch(x_mri)
+        loss = np.abs(pred - x_ct)[x_ct>-1]
         loss_list.append(loss)
 
     experiment.log_metrics({eval_type + "_loss": np.mean(loss_list)})
