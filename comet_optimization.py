@@ -43,5 +43,5 @@ for experiment in opt.get_experiments():
 
     # How well did it do?
     utils.plot_results(experiment, model, gen_val)
-    utils.evaluate(experiment, model, gen_test, "test")
+    utils.evaluate(experiment, model, gen_test, "test", args.task)
     experiment.end()

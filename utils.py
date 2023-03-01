@@ -98,7 +98,7 @@ def get_dataset_path(experiment, task):
     
     return data_path
     
-def evaluate(experiment, model, gen, eval_type):
+def evaluate(experiment, model, gen, eval_type, task):
     import numpy as np
     from tensorflow.keras.utils import OrderedEnqueuer
     
@@ -107,10 +107,15 @@ def evaluate(experiment, model, gen, eval_type):
     data_seq = test_seq.get()
     loss_list = []
     for idx in range(int(len(gen))):
-        x_mri, x_ct = next(data_seq)
-        pred = model.predict_on_batch(x_mri)
-        loss = 1000 * np.abs(pred - x_ct[0])[x_ct[0]>-1]
-        loss_list.extend(loss)
+        if (task == "sct"):
+            x_mri, x_ct = next(data_seq)
+            pred = model.predict_on_batch(x_mri)
+            loss = 1000 * np.abs(pred - x_ct[0])[x_ct[0]>-1]
+            loss_list.extend(loss)
+        elif (task == "transfer"):
+            x_t1, x_t1ce = next(data_seq)
+            loss = model.test_on_batch(x_t1, x_t1ce)
+            loss_list.extend(loss)
 
     experiment.log_metrics({eval_type + "_loss": np.mean(loss_list)})
     gen.on_epoch_end()

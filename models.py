@@ -159,7 +159,7 @@ class SRResNet():
             
         return model
 
-    def train(experiment, model, gen_train, gen_val):
+    def train(experiment, model, task, gen_train, gen_val):
         from tensorflow.keras.utils import OrderedEnqueuer
         from tensorflow.config.experimental import get_device_details, get_memory_info
         from tensorflow.config import list_physical_devices
@@ -167,7 +167,7 @@ class SRResNet():
         import utils
         
         if (utils.memory_check(experiment, model) == False):
-            val_score = utils.evaluate(experiment, model, gen_val, "val")
+            val_score = utils.evaluate(experiment, model, gen_val, "val", task)
             return
         tr_seq = OrderedEnqueuer(gen_train, use_multiprocessing=True)
         min_loss = np.inf
@@ -177,7 +177,7 @@ class SRResNet():
             tr_seq.start(workers=2, max_queue_size=20)
             data_seq = tr_seq.get()
             train_loss = []
-            for idx in range(int(len(gen_train))):
+            for idx in range(100):#int(len(gen_train))):
                 x_mri, x_ct = next(data_seq)
                 gan_loss = model.train_on_batch(x_mri, x_ct)
                 train_loss.append(gan_loss)
@@ -186,7 +186,7 @@ class SRResNet():
             tr_seq.stop()
             experiment.log_metrics({"training_loss": np.mean(train_loss)}, epoch=epoch)
 
-            val_score = utils.evaluate(experiment, model, gen_val, "val")
+            val_score = utils.evaluate(experiment, model, gen_val, "val", task)
             if (val_score < min_loss):
                 patience = 0
                 min_loss = val_score
