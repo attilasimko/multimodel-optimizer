@@ -28,7 +28,7 @@ class SRResNet():
                 #     "sigma": 50,
                 #     "scalingType": "normal",
                 # },
-                "optimizer": {"type": "discrete", "values": ["Adam", "SGD", "RMSprop"]},
+                "optimizer": {"type": "categorical", "values": ["Adam", "SGD", "RMSprop"]},
                 "learning_rate": {"type": "discrete", "values": [0.001, 0.0001, 0.00001]},
                 "num_filters": {"type": "integer", "min": 32, "max": 64},
                 "dropout_rate": {"type": "float", "min": 0.0, "max": 0.6},
