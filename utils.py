@@ -106,7 +106,7 @@ def evaluate(experiment, model, gen, eval_type, task):
     test_seq.start(workers=experiment.get_parameter("workers"), max_queue_size=experiment.get_parameter("max_queue_size"))
     data_seq = test_seq.get()
     loss_list = []
-    for idx in range(100):#int(len(gen))):
+    for idx in range(int(len(gen))):
         if (task == "sct"):
             x_mri, x_ct = next(data_seq)
             pred = model.predict_on_batch(x_mri)

@@ -181,7 +181,7 @@ class SRResNet():
             tr_seq.start(workers=experiment.get_parameter("workers"), max_queue_size=experiment.get_parameter("max_queue_size"))
             data_seq = tr_seq.get()
             train_loss = []
-            for idx in range(500):#int(len(gen_train))):
+            for idx in range(1000):#int(len(gen_train))):
                 x, y = next(data_seq)
                 loss = model.train_on_batch(x, y)
                 train_loss.append(loss)
