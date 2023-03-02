@@ -4,25 +4,28 @@ def setup_generators(experiment, task):
     if (task == "sct"):
         input = "mr"
         output = "ct"
-    if (task == "transfer"):
-        input = "t1"
-        output = "t1ce"
-
-    gen_train = data.DataGenerator(data_path + "training/",
+        gen_train = data.DataGenerator(data_path + "training/",
                             inputs=[[input, False, 'float32']],
                             outputs=[[output, False, 'float32']],
                             batch_size=experiment.get_parameter("batch_size"),
                             shuffle=True)
-    gen_val = data.DataGenerator(data_path + "validating/",
-                            inputs=[[input, False, 'float32']],
-                            outputs=[[output, False, 'float32']],
-                            batch_size=experiment.get_parameter("batch_size"),
-                            shuffle=False)
-    gen_test = data.DataGenerator(data_path + "testing/",
-                            inputs=[[input, False, 'float32']],
-                            outputs=[[output, False, 'float32']],
-                            batch_size=experiment.get_parameter("batch_size"),
-                            shuffle=False)
+        gen_val = data.DataGenerator(data_path + "validating/",
+                                inputs=[[input, False, 'float32']],
+                                outputs=[[output, False, 'float32']],
+                                batch_size=experiment.get_parameter("batch_size"),
+                                shuffle=False)
+        gen_test = data.DataGenerator(data_path + "testing/",
+                                inputs=[[input, False, 'float32']],
+                                outputs=[[output, False, 'float32']],
+                                batch_size=experiment.get_parameter("batch_size"),
+                                shuffle=False)
+    if (task == "transfer"):
+        input = "t1"
+        output = "t1ce"
+    if (task == "denoise"):
+        # ...
+
+    
     
     return gen_train, gen_val, gen_test
 
@@ -106,7 +109,7 @@ def evaluate(experiment, model, gen, eval_type, task):
     test_seq.start(workers=experiment.get_parameter("workers"), max_queue_size=experiment.get_parameter("max_queue_size"))
     data_seq = test_seq.get()
     loss_list = []
-    for idx in range(int(len(gen))):
+    for (i, data) in enumerate(gen):
         if (task == "sct"):
             x_mri, x_ct = next(data_seq)
             pred = model.predict_on_batch(x_mri)

@@ -188,7 +188,6 @@ class SRResNet():
             gen_train.on_epoch_end()
             tr_seq.stop()
             toc = time.perf_counter()
-            experiment.log_metrics({})
             experiment.log_metrics({"training_loss": np.mean(train_loss),
                                     "epoch_time": toc - tic}, epoch=epoch)
 
@@ -202,6 +201,7 @@ class SRResNet():
                 if patience > patience_thr:
                     print("Early stopping")
                     break
+
 
 class PT_SRResNet:
     # https://github.com/twtygqyy/pytorch-SRResNet
@@ -341,3 +341,12 @@ class PT_SRResNet:
             out = self.fc2(out)
             out = self.sigmoid(out)
             return out.view(-1, 1).squeeze(1)
+
+class Pix2Pix():
+    config = {
+            "algorithm": "bayes",
+            "name": "SRResNet",
+            "spec": {"maxCombo": 20, "objective": "minimize", "metric": "val_loss"},
+            "parameters": {
+            }
+    }
