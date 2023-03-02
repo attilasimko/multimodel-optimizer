@@ -37,7 +37,7 @@ class SRResNet():
             "trials": 1,
         }
 
-    def build_TF_SRResNet(experiment, task):
+    def build_TF_SRResNet(experiment, task, dropout_rate):
         from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, ZeroPadding2D, Dropout,\
         Flatten, BatchNormalization, AveragePooling2D, Dense, Activation, Add , Concatenate, add, LeakyReLU
         from tensorflow.keras.models import Model
@@ -55,7 +55,6 @@ class SRResNet():
         from tensorflow.python.keras.layers import PReLU, ReLU
 
         input = Input(shape=(512, 512, 1))
-        dropout_rate = experiment.get_parameter('dropout_rate')
         num_filters = experiment.get_parameter('num_filters')
             
         x = Conv2D(4, kernel_size=3, padding='same')(input)

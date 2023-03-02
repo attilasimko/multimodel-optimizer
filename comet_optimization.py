@@ -34,7 +34,7 @@ for experiment in opt.get_experiments():
     # Build the model:
     if (args.model == "srresnet"):
         # model = models._SRResNet(experiment)
-        model = models.SRResNet.build_TF_SRResNet(experiment, args.task)
+        model = models.SRResNet.build_TF_SRResNet(experiment, args.task, experiment.get_parameter('dropout_rate'))
     else:
         raise Exception("Unknown model")
 
