@@ -57,6 +57,9 @@ for patient in patients:
             if (np.isnan(flair_slice * t2_slice * t1_slice * t1ce_slice).any()):
                 continue
 
+            if (np.sum(t1_slice > 0.05 * (np.max(t1_slice) - np.min(t1_slice))) < 512*512*0.25):
+                continue
+
             np.savez(save_path + patient + '_' + str(slc),
                      flair=flair_slice,
                      t2=t2_slice,
