@@ -124,7 +124,7 @@ def evaluate(experiment, model, gen, eval_type, task):
 
 def plot_results(experiment, model, gen):
     import matplotlib.pyplot as plt
-    x, y = gen[0]
+    x, y = gen[20]
     plt.figure(figsize=(12, 4))
     plt.subplot(131)
     plt.imshow(x[0][0, :, :, 0], cmap='gray')
