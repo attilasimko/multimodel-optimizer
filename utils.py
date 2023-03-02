@@ -124,18 +124,21 @@ def evaluate(experiment, model, gen, eval_type, task):
 
 def plot_results(experiment, model, gen):
     import matplotlib.pyplot as plt
-    mr, ct = gen[0]
+    x, y = gen[0]
     plt.figure(figsize=(12, 4))
     plt.subplot(131)
-    plt.imshow(mr[0][0, :, :, 0], cmap='gray')
+    plt.imshow(x[0][0, :, :, 0], cmap='gray')
+    plt.colorbar()
     plt.xticks([])
     plt.yticks([])
     plt.subplot(132)
-    plt.imshow(ct[0][0, :, :, 0], cmap='gray')
+    plt.imshow(y[0][0, :, :, 0], cmap='gray')
+    plt.colorbar()
     plt.xticks([])
     plt.yticks([])
     plt.subplot(133)
-    plt.imshow(model.predict_on_batch(mr)[0, :, :, 0], cmap='gray')
+    plt.imshow(model.predict_on_batch(x)[0, :, :, 0], cmap='gray')
+    plt.colorbar()
     plt.xticks([])
     plt.yticks([])
     experiment.log_figure(figure=plt, figure_name="results", overwrite=True)

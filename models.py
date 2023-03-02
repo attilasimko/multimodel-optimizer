@@ -18,9 +18,9 @@ def znorm(x):
 
 class SRResNet():
     config = {
-            "algorithm": "random",
+            "algorithm": "bayes",
             "name": "SRResNet",
-            "spec": {"maxCombo": 52, "objective": "minimize", "metric": "val_loss"},
+            "spec": {"maxCombo": 20, "objective": "minimize", "metric": "val_loss"},
             "parameters": {
                 # "first_layer_units": {
                 #     "type": "integer",
@@ -150,7 +150,6 @@ class SRResNet():
             output = Activation(znorm)(output)
 
         model = Model(input, output)
-        model.compile(optimizer=Adam(0.001), loss='mse', metrics=['mse'])
         if (experiment.get_parameter("optimizer") == "Adam"): # "Adam", "SGD", "RMSprop"
             model.compile(optimizer=Adam(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
         elif (experiment.get_parameter("optimizer") == "SGD"):
