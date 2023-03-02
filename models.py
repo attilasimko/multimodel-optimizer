@@ -28,13 +28,11 @@ class SRResNet():
                 #     "sigma": 50,
                 #     "scalingType": "normal",
                 # },
-                # "optimizer": {"type": "categorical", "values": ["Adam", "SGD", "RMSprop"]},
-                # "learning_rate": {"type": "discrete", "values": [0.001, 0.0001, 0.00001]},
-                # "num_filters": {"type": "integer", "min": 32, "max": 64},
-                # "dropout_rate": {"type": "float", "min": 0.0, "max": 0.6},
-                # "batch_size": {"type": "discrete", "values": [4, 8]},
-                 "workers": {"type": "discrete", "values": [1, 2, 4, 6, 8, 12, 16, 20]},
-                 "max_queue_size": {"type": "discrete", "values": [2, 4, 8, 16, 32, 64, 128]},
+                "optimizer": {"type": "categorical", "values": ["Adam", "SGD", "RMSprop"]},
+                "learning_rate": {"type": "discrete", "values": [0.001, 0.0001, 0.00001]},
+                "num_filters": {"type": "integer", "min": 32, "max": 64},
+                "dropout_rate": {"type": "float", "min": 0.0, "max": 0.6},
+                "batch_size": {"type": "discrete", "values": [4, 8]},
             },
             "trials": 1,
         }
@@ -57,8 +55,8 @@ class SRResNet():
         from tensorflow.python.keras.layers import PReLU, ReLU
 
         input = Input(shape=(512, 512, 1))
-        dropout_rate = 0.2#experiment.get_parameter('dropout_rate')
-        num_filters = 64#experiment.get_parameter('num_filters')
+        dropout_rate = experiment.get_parameter('dropout_rate')
+        num_filters = experiment.get_parameter('num_filters')
             
         x = Conv2D(4, kernel_size=3, padding='same')(input)
         x = x_1 = LeakyReLU(0.2)(x)
@@ -153,12 +151,12 @@ class SRResNet():
 
         model = Model(input, output)
         model.compile(optimizer=Adam(0.001), loss='mse', metrics=['mse'])
-        # if (experiment.get_parameter("optimizer") == "Adam"): # "Adam", "SGD", "RMSprop"
-        #     model.compile(optimizer=Adam(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
-        # elif (experiment.get_parameter("optimizer") == "SGD"):
-        #     model.compile(optimizer=SGD(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
-        # elif (experiment.get_parameter("optimizer") == "RMSprop"):
-        #     model.compile(optimizer=SGD(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
+        if (experiment.get_parameter("optimizer") == "Adam"): # "Adam", "SGD", "RMSprop"
+            model.compile(optimizer=Adam(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
+        elif (experiment.get_parameter("optimizer") == "SGD"):
+            model.compile(optimizer=SGD(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
+        elif (experiment.get_parameter("optimizer") == "RMSprop"):
+            model.compile(optimizer=SGD(experiment.get_parameter("learning_rate")), loss='mse', metrics=['mse'])
             
         return model
 
@@ -168,37 +166,43 @@ class SRResNet():
         from tensorflow.config import list_physical_devices
         import numpy as np
         import utils
+        import time
         
-        # if (utils.memory_check(experiment, model) == False):
-        #     val_score = utils.evaluate(experiment, model, gen_val, "val", task)
-        #     return
+        if (utils.memory_check(experiment, model) == False):
+            val_score = utils.evaluate(experiment, model, gen_val, "val", task)
+            return
+        
         min_loss = np.inf
         patience = 0
         patience_thr = 5
         for epoch in range(experiment.get_parameter("epochs")):
+            tic = time.perf_counter()
             tr_seq = OrderedEnqueuer(gen_train, use_multiprocessing=experiment.get_parameter("use_multiprocessing") == "True")
             tr_seq.start(workers=experiment.get_parameter("workers"), max_queue_size=experiment.get_parameter("max_queue_size"))
             data_seq = tr_seq.get()
             train_loss = []
-            for idx in range(50):#int(len(gen_train))):
+            for idx in range(500):#int(len(gen_train))):
                 x, y = next(data_seq)
                 loss = model.train_on_batch(x, y)
                 train_loss.append(loss)
 
             gen_train.on_epoch_end()
             tr_seq.stop()
-            experiment.log_metrics({"training_loss": np.mean(train_loss)}, epoch=epoch)
+            toc = time.perf_counter()
+            experiment.log_metrics({})
+            experiment.log_metrics({"training_loss": np.mean(train_loss),
+                                    "epoch_time": toc - tic}, epoch=epoch)
 
-            val_score = utils.evaluate(experiment, model, gen_val, "temp", task)
-            # if (val_score < min_loss):
-            #     patience = 0
-            #     min_loss = val_score
-            #     print("Validation score %s", val_score)
-            # else:
-            #     patience += 1
-            #     if patience > patience_thr:
-            #         print("Early stopping")
-            #         break
+            val_score = utils.evaluate(experiment, model, gen_val, "val", task)
+            if (val_score < min_loss):
+                patience = 0
+                min_loss = val_score
+                print("Validation score %s", val_score)
+            else:
+                patience += 1
+                if patience > patience_thr:
+                    print("Early stopping")
+                    break
 
 class PT_SRResNet:
     # https://github.com/twtygqyy/pytorch-SRResNet

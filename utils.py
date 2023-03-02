@@ -11,17 +11,17 @@ def setup_generators(experiment, task):
     gen_train = data.DataGenerator(data_path + "training/",
                             inputs=[[input, False, 'float32']],
                             outputs=[[output, False, 'float32']],
-                            batch_size=4,#experiment.get_parameter("batch_size"),
+                            batch_size=experiment.get_parameter("batch_size"),
                             shuffle=True)
     gen_val = data.DataGenerator(data_path + "validating/",
                             inputs=[[input, False, 'float32']],
                             outputs=[[output, False, 'float32']],
-                            batch_size=4,#experiment.get_parameter("batch_size"),
+                            batch_size=experiment.get_parameter("batch_size"),
                             shuffle=False)
     gen_test = data.DataGenerator(data_path + "testing/",
                             inputs=[[input, False, 'float32']],
                             outputs=[[output, False, 'float32']],
-                            batch_size=4,#experiment.get_parameter("batch_size"),
+                            batch_size=experiment.get_parameter("batch_size"),
                             shuffle=False)
     
     return gen_train, gen_val, gen_test
@@ -36,7 +36,7 @@ def memory_check(experiment, model):
     available_memory = np.round(info.total / (1024.0 ** 3), 3) # We could just hard-set this to 10GB. That's the limit on the smallest GPUs we have.
     nvidia_smi.nvmlShutdown()
 
-    required_memory = get_TF_memory_usage(4, model)#experiment.get_parameter("batch_size"), model) 
+    required_memory = get_TF_memory_usage(experiment.get_parameter("batch_size"), model) 
     experiment.log_parameter("reqmemory", required_memory)
 
     if (required_memory > available_memory):
@@ -106,7 +106,7 @@ def evaluate(experiment, model, gen, eval_type, task):
     test_seq.start(workers=experiment.get_parameter("workers"), max_queue_size=experiment.get_parameter("max_queue_size"))
     data_seq = test_seq.get()
     loss_list = []
-    for idx in range(10):#int(len(gen))):
+    for idx in range(100):#int(len(gen))):
         if (task == "sct"):
             x_mri, x_ct = next(data_seq)
             pred = model.predict_on_batch(x_mri)

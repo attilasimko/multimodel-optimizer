@@ -3,7 +3,6 @@ import models
 import utils
 import argparse
 import os
-import time
 comet_ml.init(api_key="ro9UfCMFS2O73enclmXbXfJJj", project_name='comet-optimizer')
 
 parser = argparse.ArgumentParser(description='Welcome.')
@@ -27,8 +26,8 @@ for experiment in opt.get_experiments():
     experiment.log_parameter("task", args.task)
     experiment.log_parameter("model", args.model)
     experiment.log_parameter("epochs", 10)
-    # experiment.log_parameter("workers", 10)
-    # experiment.log_parameter("max_queue_size", 10)
+    experiment.log_parameter("workers", 4)
+    experiment.log_parameter("max_queue_size", 4)
     experiment.log_parameter("use_multiprocessing", "False")
     gen_train, gen_val, gen_test = utils.setup_generators(experiment, args.task)
 
@@ -39,16 +38,13 @@ for experiment in opt.get_experiments():
     else:
         raise Exception("Unknown model")
 
-    tic = time.perf_counter()
     # Train the model:
     if (args.model == "srresnet"):
         models.SRResNet.train(experiment, model, args.task, gen_train, gen_val)
     else:
         raise Exception("Unknown model")
-    toc = time.perf_counter()
-    experiment.log_metrics({"val_loss": toc - tic})
 
     # How well did it do?
-    # utils.plot_results(experiment, model, gen_val)
-    # utils.evaluate(experiment, model, gen_test, "test", args.task)
+    utils.plot_results(experiment, model, gen_val)
+    utils.evaluate(experiment, model, gen_test, "test", args.task)
     experiment.end()
