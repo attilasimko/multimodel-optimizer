@@ -29,7 +29,7 @@ class SRResNet():
                 #     "scalingType": "normal",
                 # },
                 "optimizer": {"type": "categorical", "values": ["Adam", "SGD", "RMSprop"]},
-                "learning_rate": {"type": "discrete", "values": [0.001, 0.0001, 0.00001]},
+                "learning_rate": {"type": "float", "scalingType": "loguniform", "min": 0.0000001, "max": 0.0005},
                 "num_filters": {"type": "integer", "min": 32, "max": 64},
                 "dropout_rate": {"type": "float", "min": 0.0, "max": 0.6},
                 "batch_size": {"type": "discrete", "values": [4, 8]},
