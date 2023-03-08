@@ -10,21 +10,6 @@ from data.base_dataset import BaseDataset
 from utils import util_general
 
 
-def get_train_transform():
-
-    transform_list = []
-    transform_list += [A.Normalize(mean=(0,), std=(1,), always_apply=True)]
-    transform_list += [ToTensorV2()]
-    transform_compose = A.Compose(transform_list)
-    return transform_compose
-
-def get_valid_transform():
-
-    transform_list = []
-    transform_list += [A.Normalize(mean=(127.5,), std=(127.5,), max_pixel_value=1.0, always_apply=True)]
-    transform_list += [ToTensorV2()]
-    transform_compose = A.Compose(transform_list)
-    return transform_compose
 
 class BRATSDataset(BaseDataset):
     """A dataset class for paired medical image dataset.
@@ -85,13 +70,6 @@ class BRATSDataset(BaseDataset):
         if len(self.AB_paths) == 0:
             raise IOError("No image files found in the specified path")
 
-        # Get transform.
-        if phase == 'train':
-            self.transform = get_train_transform()
-        elif phase in ['val', 'test']:
-            self.transform = get_valid_transform()
-        else:
-            raise NotImplementedError
 
     def __getitem__(self, index):
         """Return a data point and its metadata information.
@@ -123,8 +101,8 @@ class BRATSDataset(BaseDataset):
         B = AB[self._mode_to_idx['t1ce'], :, :].astype("float32")  # T1ce
 
         # Perform transforms.
-        A_transform = self.transform(image = A)['image']
-        B_transform = self.transform(image = B)['image']
+        A_transform = self.transform(A)
+        B_transform = self.transform(B)
 
 
         model = self.opt.get_parameter("model")
@@ -135,6 +113,11 @@ class BRATSDataset(BaseDataset):
         else:
             raise NotImplementedError
 
+    def transform(self, img):
+        img = img - np.mean(img)
+        img = img / np.std(img)
+        return img
+    
     def __len__(self):
         """Return the total number of images in the dataset."""
         return len(self.AB_paths)

@@ -103,14 +103,14 @@ def evaluate(experiment, model, gen, eval_type, task):
     loss_list = []
     for i, data in enumerate(gen):
         if (task == "sct"):
-            x_mri = np.moveaxis(data[0].numpy(), 1, 3)
-            x_ct = np.moveaxis(data[1].numpy(), 1, 3)
+            x_mri = np.expand_dims(data[0].numpy(), 3)
+            x_ct = np.expand_dims(data[1].numpy(), 3)
             pred = model.predict_on_batch(x_mri)
             loss = 1000 * np.abs(pred - x_ct[0])[x_ct[0]>-1]
             loss_list.extend(loss)
         elif (task == "transfer"):
-            x_t1 = np.moveaxis(data[0].numpy(), 1, 3)
-            x_t1ce = np.moveaxis(data[1].numpy(), 1, 3)
+            x_t1 = np.expand_dims(data[0].numpy(), 3)
+            x_t1ce = np.expand_dims(data[1].numpy(), 3)
             loss = model.test_on_batch(x_t1, x_t1ce)
             loss_list.extend(loss)
 
