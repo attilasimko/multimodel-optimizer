@@ -2,9 +2,7 @@ import os
 import pickle5 as pickle
 import zipfile
 
-import albumentations as A
 import numpy as np
-from albumentations.pytorch import ToTensorV2
 
 from data.base_dataset import BaseDataset
 from utils import util_general
