@@ -42,16 +42,7 @@ class BRATSDataset(BaseDataset):
         self.opt = opt
         self._path = opt.get_parameter("dataroot")
 
-        # Check Modalities.
-        task = opt.get_parameter("task")
-        if task == "transfer":
-            self._modalities = ["t1", "t1ce"]
-        elif task == "sct":
-            self._modalities = ["mr", "ct"]
-        elif task == "denoise":
-            self._modalities = ["lr", "hr"]
-        else:
-            raise NotImplementedError
+        self._modalities = ["t1", "t1ce"]
         
         assert len(self._modalities) > 0
         self._mode_to_idx = {mode: i for i, mode in enumerate(self._modalities)}

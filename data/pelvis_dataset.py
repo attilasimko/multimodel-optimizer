@@ -1,5 +1,5 @@
 import os
-import pickle
+import pickle5 as pickle
 import zipfile
 
 import albumentations as A
@@ -46,7 +46,7 @@ class PelvisDataset(BaseDataset):
         parser.add_argument('--modalities', help="Dataset modalities", metavar="STRING", type=str, default="MR_nonrigid_CT,MR_MR_T2")
         return parser
 
-    def __init__(self, opt):
+    def __init__(self, opt, phase):
         """Initialize this dataset class.
 
         Parameters:
@@ -55,10 +55,9 @@ class PelvisDataset(BaseDataset):
         # Save the option and dataset root.
         BaseDataset.__init__(self, opt)
         self.opt = opt
-        self._path = opt.dataroot
-
-        # Check Modalities.
-        self._modalities = util_general.parse_comma_separated_list(opt.modalities)
+        self._path = opt.get_parameter("dataroot")
+        self._modalities = ['MR_MR_T2', 'MR_nonrigid_CT']
+        
         assert len(self._modalities) > 0
         self._mode_to_idx = {mode: i for i, mode in enumerate(self._modalities)}
         self._idx_to_mode = {i: mode for mode, i in self._mode_to_idx.items()}
@@ -72,17 +71,9 @@ class PelvisDataset(BaseDataset):
             raise IOError("Path must point to a directory or zip")
 
         # Get the image paths.
-        self.AB_paths = sorted(fname for fname in self._all_fnames if self._file_ext(fname) == ".pickle" and  opt.phase in fname)
+        self.AB_paths = sorted(fname for fname in self._all_fnames if self._file_ext(fname) == ".pickle" and  phase in fname)
         if len(self.AB_paths) == 0:
             raise IOError("No image files found in the specified path")
-
-        # Get transform.
-        if opt.phase == 'train':
-            self.transform = get_train_transform()
-        elif opt.phase in ['val', 'test']:
-            self.transform = get_valid_transform()
-        else:
-            raise NotImplementedError
 
     def __getitem__(self, index):
         """Return a data point and its metadata information.
@@ -107,18 +98,32 @@ class PelvisDataset(BaseDataset):
         # Sanity checks.
         assert AB.dtype == np.dtype('float32')
         assert isinstance(AB, np.ndarray)
-        assert AB.shape == (len(self._modalities), self.opt.load_size, self.opt.load_size)
+        assert AB.shape == (len(self._modalities), self.opt.get_parameter("load_size"), self.opt.get_parameter("load_size"))
 
         # Select image A and B.
-        A = AB[self._mode_to_idx['MR_nonrigid_CT'], :, :].astype("float32")  # CT
-        B = AB[self._mode_to_idx['MR_MR_T2'], :, :].astype("float32")  # MRI
+        A = AB[self._mode_to_idx['MR_MR_T2'], :, :].astype("float32")  # MRI
+        B = AB[self._mode_to_idx['MR_nonrigid_CT'], :, :].astype("float32")  # CT
 
         # Perform transforms.
-        A_transform = self.transform(image = A)['image']
-        B_transform = self.transform(image = B)['image']
+        A_transform = self.transform_mr(A)
+        B_transform = self.transform_ct(B)
 
-        return {'A': A_transform, 'B': B_transform, 'A_paths': AB_path, 'B_paths': AB_path}
 
+        model = self.opt.get_parameter("model")
+        if model == "srresnet":
+            return [A_transform, B_transform]
+        elif model == "pix2pix":
+            return {'A': A_transform, 'B': B_transform, 'A_paths': AB_path, 'B_paths': AB_path}
+
+    def transform_mr(self, img):
+        img = img - np.mean(img)
+        img = img / np.std(img)
+        return img
+    
+    def transform_ct(self, img):
+        img = (img / 85) - 1.0
+        return img
+    
     def __len__(self):
         """Return the total number of images in the dataset."""
         return len(self.AB_paths)
@@ -158,10 +163,10 @@ class PelvisDataset(BaseDataset):
         # Sanity checks.
         assert AB.dtype == np.dtype('float32')
         assert isinstance(AB, np.ndarray)
-        assert AB.shape == (len(self._modalities), self.opt.load_size, self.opt.load_size)
+        assert AB.shape == (len(self._modalities), self.opt.get_parameter("load_size"), self.opt.get_parameter("load_size"))
 
         # Select image A and B.
-        A = AB[self._mode_to_idx['MR_nonrigid_CT'], :, :].astype("float32")  # CT
-        B = AB[self._mode_to_idx['MR_MR_T2'], :, :].astype("float32")  # MRI
+        A = AB[self._mode_to_idx['MR_MR_T2'], :, :].astype("float32")  # MRI
+        B = AB[self._mode_to_idx['MR_nonrigid_CT'], :, :].astype("float32")  # CT
 
         return A, B, AB_path
