@@ -52,7 +52,6 @@ def build_TF_SRResNet(experiment, task, dropout_rate):
     import tensorflow as tf
     from tensorflow.keras.models import Model
     from tensorflow.keras.layers import Input, Conv2D, BatchNormalization, Add, Lambda, UpSampling2D, Conv2DTranspose
-    from tensorflow.python.keras.layers import PReLU, ReLU
 
     input = Input(shape=(256, 256, 1))
     num_filters = experiment.get_parameter('num_filters')
