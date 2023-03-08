@@ -47,7 +47,7 @@ def make_mask(img, thr):
     mask = ndimage.binary_dilation(mask, iterations=2)
     label_im, nb_labels = ndimage.label(mask)
     sizes = ndimage.sum(mask, label_im, range(nb_labels + 1))
-    mask = sizes > 512*512*0.08
+    mask = sizes > 256*256*0.08
     mask = mask[label_im]
     mask = ndimage.binary_fill_holes(mask)
     return mask
@@ -62,7 +62,7 @@ os.mkdir(target_dir)
 os.mkdir(target_dir + "testing")
 os.mkdir(target_dir + "validating")
 os.mkdir(target_dir + "training")
-
+img_size = 256
 patient_idx = 0
 lst = os.listdir(temp_dir)
 lst.sort()
@@ -105,12 +105,12 @@ for patient in lst:
                     print(str(patient) + "\t" + str(len(CT_STACK)))
                     for i in range(len(MR_STACK)):
                         ct = (CT_STACK[i].RescaleIntercept + CT_STACK[i].RescaleSlope * CT_STACK[i].pixel_array) / 1000
-                        ct = np.clip(cv2.resize(ct, (512, 512)), -1, 1)
+                        ct = np.clip(cv2.resize(ct, (img_size, img_size)), -1, 1)
                         mask = make_mask(ct, -0.2)
                         ct = crop_image(ct, mask, -1)
 
                         mr =  MR_STACK[i].pixel_array / np.mean(MR_STACK[i].pixel_array)
-                        mr = cv2.resize(mr, (512, 512))
+                        mr = cv2.resize(mr, (img_size, img_size))
                         mr = crop_image(mr, mask, 0)
                         if ((np.max(mr) == 0) | (np.isnan(mr).any())): 
                             continue

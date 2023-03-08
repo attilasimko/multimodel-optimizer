@@ -1,5 +1,6 @@
 def setup_generators(experiment, task):
     import data
+    
     data_path = get_dataset_path(experiment, task)
     if (task == "sct"):
         input = "mr"
@@ -19,12 +20,6 @@ def setup_generators(experiment, task):
                                 outputs=[[output, False, 'float32']],
                                 batch_size=experiment.get_parameter("batch_size"),
                                 shuffle=False)
-    if (task == "transfer"):
-        input = "t1"
-        output = "t1ce"
-    if (task == "denoise"):
-        # ...
-
     
     
     return gen_train, gen_val, gen_test
@@ -93,9 +88,9 @@ def get_dataset_path(experiment, task):
         experiment.log_parameter("server", "cluster")
 
     if (task == "sct"):
-        data_path += 'DS0060/'
+        data_path += 'Pelvis_2.1_repo_no_mask-num-375_train-0.70_val-0.20_test-0.10.zip'
     elif (task == "transfer"):
-        data_path += 'DS0061/'
+        data_path += 'brats.zip' 
     else:
         raise Exception("Unknown task")
     
@@ -105,24 +100,21 @@ def evaluate(experiment, model, gen, eval_type, task):
     import numpy as np
     from tensorflow.keras.utils import OrderedEnqueuer
     
-    test_seq = OrderedEnqueuer(gen, use_multiprocessing=experiment.get_parameter("use_multiprocessing") == "True")
-    test_seq.start(workers=experiment.get_parameter("workers"), max_queue_size=experiment.get_parameter("max_queue_size"))
-    data_seq = test_seq.get()
     loss_list = []
-    for (i, data) in enumerate(gen):
+    for i, data in enumerate(gen):
         if (task == "sct"):
-            x_mri, x_ct = next(data_seq)
+            x_mri = np.moveaxis(data[0].numpy(), 1, 3)
+            x_ct = np.moveaxis(data[1].numpy(), 1, 3)
             pred = model.predict_on_batch(x_mri)
             loss = 1000 * np.abs(pred - x_ct[0])[x_ct[0]>-1]
             loss_list.extend(loss)
         elif (task == "transfer"):
-            x_t1, x_t1ce = next(data_seq)
+            x_t1 = np.moveaxis(data[0].numpy(), 1, 3)
+            x_t1ce = np.moveaxis(data[1].numpy(), 1, 3)
             loss = model.test_on_batch(x_t1, x_t1ce)
             loss_list.extend(loss)
 
     experiment.log_metrics({eval_type + "_loss": np.mean(loss_list)})
-    gen.on_epoch_end()
-    test_seq.stop()
     return np.mean(loss_list)
 
 def plot_results(experiment, model, gen):

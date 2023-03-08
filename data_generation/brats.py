@@ -16,7 +16,7 @@ def znorm(img):
     img = img / np.std(img)
     return img
 
-dataset = '/mnt/f4616a95-e470-4c0f-a21e-a75a8d283b9e/RAW/brats_mixed/'
+dataset = '/mnt/f4616a95-e470-4c0f-a21e-a75a8d283b9e/RAW/BRATS2021/RSNA_ASNR_MICCAI_BraTS2021_TrainingData_16July2021/'
 target_dir = '/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/DS0061/'
 
 if (os.path.isdir(target_dir)):
@@ -28,7 +28,7 @@ os.mkdir(target_dir + "training")
 
 patients = os.listdir(dataset)
 patients = random.sample(patients, len(patients))
-img_size = 512
+img_size = 256
 pat_idx = 0
 for patient in patients:
     if (pat_idx / len(patients) < 0.8):
@@ -57,7 +57,7 @@ for patient in patients:
             if (np.isnan(flair_slice * t2_slice * t1_slice * t1ce_slice).any()):
                 continue
 
-            if (np.sum(t1_slice > 0.05 * (np.max(t1_slice) - np.min(t1_slice))) < 512*512*0.25):
+            if (np.sum(t1_slice > 0.05 * (np.max(t1_slice) - np.min(t1_slice))) < img_size*img_size*0.25):
                 continue
 
             np.savez(save_path + patient + '_' + str(slc),

@@ -1,13 +1,14 @@
 import comet_ml
 import models
-import utils
+import utils_old
 import argparse
+from data import create_dataset
 import os
 comet_ml.init(api_key="ro9UfCMFS2O73enclmXbXfJJj", project_name='comet-optimizer')
 
 parser = argparse.ArgumentParser(description='Welcome.')
 parser.add_argument("--gpu", default=None)
-parser.add_argument("--task", default="sct") # sct / denoise / transfer / time
+parser.add_argument("--task", default="transfer") # sct / denoise / transfer
 parser.add_argument("--model", default="srresnet") # srresnet / pix2pix / diffusion
 args = parser.parse_args()
 
@@ -21,15 +22,19 @@ opt = comet_ml.Optimizer(config)
 
 experiment_idx = 0
 for experiment in opt.get_experiments():
+    dataroot = utils_old.get_dataset_path(experiment, args.task)
     experiment.set_name(f"{args.task}_{args.model}_{experiment_idx}")
     experiment_idx += 1
     experiment.log_parameter("task", args.task)
     experiment.log_parameter("model", args.model)
+    experiment.log_parameter("load_size", 256)
+    experiment.log_parameter("dataroot", dataroot)
     experiment.log_parameter("epochs", 10)
+    experiment.log_parameter("max_dataset_size", 1000)
     experiment.log_parameter("workers", 4)
     experiment.log_parameter("max_queue_size", 4)
     experiment.log_parameter("use_multiprocessing", "False")
-    gen_train, gen_val, gen_test = utils.setup_generators(experiment, args.task)
+    gen_train, gen_val, gen_test = create_dataset(experiment)
 
     # Build the model:
     if (args.model == "srresnet"):
@@ -45,6 +50,6 @@ for experiment in opt.get_experiments():
         raise Exception("Unknown model")
 
     # How well did it do?
-    utils.plot_results(experiment, model, gen_val)
-    utils.evaluate(experiment, model, gen_test, "test", args.task)
+    utils_old.plot_results(experiment, model, gen_val)
+    utils_old.evaluate(experiment, model, gen_test, "test", args.task)
     experiment.end()
