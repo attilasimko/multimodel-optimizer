@@ -13,7 +13,7 @@ from utils import util_general
 def get_train_transform():
 
     transform_list = []
-    transform_list += [A.Normalize(mean=(127.5,), std=(127.5,), max_pixel_value=1.0, always_apply=True)]
+    transform_list += [A.Normalize(mean=(0,), std=(1,), always_apply=True)]
     transform_list += [ToTensorV2()]
     transform_compose = A.Compose(transform_list)
     return transform_compose
