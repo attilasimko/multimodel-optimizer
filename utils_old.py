@@ -106,7 +106,7 @@ def evaluate(experiment, model, gen, eval_type, task):
             x_mri = np.expand_dims(data[0].numpy(), 3)
             x_ct = np.expand_dims(data[1].numpy(), 3)
             pred = model.predict_on_batch(x_mri)
-            loss = 1000 * np.abs(pred - x_ct[0])[x_ct[0]>-1]
+            loss = 1000 * np.abs(pred - x_ct)[x_ct>-1]
             loss_list.extend(loss)
         elif (task == "transfer"):
             x_t1 = np.expand_dims(data[0].numpy(), 3)

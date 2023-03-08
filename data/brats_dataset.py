@@ -146,7 +146,7 @@ class BRATSDataset(BaseDataset):
         # Sanity checks.
         assert AB.dtype == np.dtype('float32')
         assert isinstance(AB, np.ndarray)
-        assert AB.shape == (len(self._modalities), self.opt.load_size, self.opt.load_size)
+        assert AB.shape == (len(self._modalities), self.opt.get_parameter("load_size"), self.opt.get_parameter("load_size"))
 
         # Select image A and B.
         A = AB[self._mode_to_idx['MR_nonrigid_CT'], :, :].astype("float32")  # CT
