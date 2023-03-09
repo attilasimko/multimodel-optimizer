@@ -74,10 +74,10 @@ class MayoClinicDataset(BaseDataset):
         # Save the option and dataset root.
         BaseDataset.__init__(self, opt)
         self.opt = opt
-        self._path = opt.dataroot
-        self.lower = opt.lower # -1000
-        self.upper = opt.upper # 2000
-        self.img_shape = opt.img_shape
+        self._path = self.opt.get_parameter("dataroot")
+        self.lower = -1000
+        self.upper = 2000
+        self.img_shape = self.opt.get_parameter("load_size")
         self.plot_verbose = opt.plot_verbose
         self.model_name = opt.model_name
 
