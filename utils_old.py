@@ -83,14 +83,21 @@ def get_dataset_path(experiment, task):
     if (os.path.isdir('/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/')): # If running on my local machine
         data_path = '/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/'
         experiment.log_parameter("server", "GERTY")
-    elif (os.path.isdir('/data/attila/')): # If running on laplace / gauss / neumann
-        data_path = '/data/attila/'
-        experiment.log_parameter("server", "cluster")
+    elif (os.path.isdir('/data_m2/lorenzo/data/')): # If running on laplace / gauss / neumann
+        data_path = '/data_m2/lorenzo/data/'
+        experiment.log_parameter("server", "laplace")
+    elif (os.path.isdir('/data/lorenzo/data/')): # If running on laplace / gauss / neumann
+        data_path = '/data/lorenzo/data/'
+        experiment.log_parameter("server", "gauss")
+    else:
+        raise Exception("Unknown server")
 
     if (task == "sct"):
-        data_path += 'Pelvis_2.1_repo_no_mask-num-375_train-0.70_val-0.20_test-0.10.zip'
+        data_path += 'interim/Pelvis_2.1_repo_no_mask/Pelvis_2.1_repo_no_mask-num-375_train-0.70_val-0.20_test-0.10.zip'
     elif (task == "transfer"):
-        data_path += 'brats.zip' 
+        data_path += 'interim/brats/brats.zip'
+    elif (task== "denoise"):
+        data_path += 'raw/mayo-clinic/Training_Image_Data/1mm B30/full_1mm/'
     else:
         raise Exception("Unknown task")
     
