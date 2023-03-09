@@ -118,26 +118,30 @@ def evaluate(experiment, model, gen, eval_type, task):
     return np.mean(loss_list)
 
 def plot_results(experiment, model, gen):
+    import numpy as np
     import matplotlib.pyplot as plt
-    x, y = gen[20]
-    plt.figure(figsize=(12, 4))
-    plt.subplot(131)
-    plt.imshow(x[0][0, :, :, 0], cmap='gray')
-    plt.colorbar()
-    plt.xticks([])
-    plt.yticks([])
-    plt.subplot(132)
-    plt.imshow(y[0][0, :, :, 0], cmap='gray')
-    plt.colorbar()
-    plt.xticks([])
-    plt.yticks([])
-    plt.subplot(133)
-    plt.imshow(model.predict_on_batch(x)[0, :, :, 0], cmap='gray')
-    plt.colorbar()
-    plt.xticks([])
-    plt.yticks([])
-    experiment.log_figure(figure=plt, figure_name="results", overwrite=True)
-    plt.close('all')
+    for i, data in enumerate(gen):
+        if (i % (len(gen) / 10) == 0):
+            x = np.expand_dims(data[0].numpy(), 3)
+            y = np.expand_dims(data[1].numpy(), 3)
+            plt.figure(figsize=(12, 4))
+            plt.subplot(131)
+            plt.imshow(x[0, :, :, 0], cmap='gray')
+            plt.colorbar()
+            plt.xticks([])
+            plt.yticks([])
+            plt.subplot(132)
+            plt.imshow(y[0, :, :, 0], cmap='gray')
+            plt.colorbar()
+            plt.xticks([])
+            plt.yticks([])
+            plt.subplot(133)
+            plt.imshow(model.predict_on_batch(x)[0, :, :, 0], cmap='gray')
+            plt.colorbar()
+            plt.xticks([])
+            plt.yticks([])
+            experiment.log_figure(figure=plt, figure_name="results_" + str(i), overwrite=True)
+            plt.close('all')
     
 def export_weights_to_hero(model):
     return
