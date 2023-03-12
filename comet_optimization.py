@@ -1,8 +1,11 @@
 import comet_ml
-import models
 import utils_misc
 import argparse
 from data import create_dataset
+from models import create_model
+from models import SRResNet
+from models import pix2pix_model
+from models import cycle_gan_model
 import os
 comet_ml.init(api_key="ro9UfCMFS2O73enclmXbXfJJj", project_name='comet-optimizer')
 
@@ -17,9 +20,9 @@ if args.gpu is not None:
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu)
 
 if args.model == "srresnet":
-    config = models.SRResNet.config
+    config = SRResNet.config
 elif args.model == "pix2pix":
-    config = models.pix2pix_model.config
+    config = pix2pix_model.config
 elif args.model == "cycle_gan":
     raise NotImplementedError
 elif args.model == "diffusion":
@@ -30,7 +33,7 @@ else:
 opt = comet_ml.Optimizer(config)
 
 experiment_idx = 0
-for experiment in opt.get_experiments():
+for experiment in opt.get_experiments(disabled=True): # todo remove disabled
     dataroot = utils_misc.get_dataset_path(experiment, args.task)
     experiment.set_name(f"{args.task}_{args.model}_{experiment_idx}")
     experiment_idx += 1
@@ -43,13 +46,15 @@ for experiment in opt.get_experiments():
     experiment.log_parameter("workers", 4)
     experiment.log_parameter("max_queue_size", 4)
     experiment.log_parameter("use_multiprocessing", "False")
+    experiment.log_parameter("plot_verbose", "False")
     gen_train, gen_val, gen_test = create_dataset(experiment)
 
     # Build the model:
     if args.model == "srresnet":
-        model = models.SRResNet.build_TF_SRResNet(experiment, args.task, experiment.get_parameter('dropout_rate'))
+        model = SRResNet.build_TF_SRResNet(experiment, args.task, experiment.get_parameter('dropout_rate'))
     elif args.model == "pix2pix":
-        raise NotImplementedError # todo build pix2pix lorenzo
+        model = create_model(experiment)  # create a model given opt.model and other options
+        model.setup(opt)
     elif args.model == "cycle_gan":
         raise NotImplementedError # todo build cyclegan lorenzo
     elif args.model == "diffusion":  # todo build diff salih
@@ -59,7 +64,7 @@ for experiment in opt.get_experiments():
 
     # Train the model:
     if args.model == "srresnet":
-        models.SRResNet.train(experiment, model, args.task, gen_train, gen_val)
+        SRResNet.train(experiment, model, args.task, gen_train, gen_val)
     elif args.model == "pix2pix":
         raise NotImplementedError # todo pix2pix training lorenzo
     elif args.model == "cycle_gan":

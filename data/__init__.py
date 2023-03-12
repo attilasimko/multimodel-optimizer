@@ -23,13 +23,10 @@ def find_dataset_using_name(task):
     """
     
     if task == "sct":
-        from data import pelvis_dataset
         dataset_name = "pelvis"
     elif task == "transfer":
-        from data import brats_dataset
         dataset_name = "brats"
-    elif task == "denoising":
-        from data import mayoclinic_dataset
+    elif task == "denoise":
         dataset_name = "mayoclinic"
     else:
         raise NotImplementedError
@@ -74,6 +71,7 @@ def create_dataset(experiment):
 
     data_loader_test = CustomDatasetDataLoader(experiment, "test")
     dataset_test = data_loader_test.load_data()
+
     return dataset_train, dataset_validate, dataset_test
 
 class CustomDatasetDataLoader:

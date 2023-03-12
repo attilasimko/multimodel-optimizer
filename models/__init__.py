@@ -20,9 +20,6 @@ See our template model class 'template_model.py' for more details.
 
 import importlib
 from models.base_model import BaseModel
-from models import SRResNet
-from models import pix2pix_model
-from models import cycle_gan_model
 
 def find_model_using_name(model_name):
     """Import the module "models/[model_name]_model.py".
@@ -45,12 +42,10 @@ def find_model_using_name(model_name):
 
     return model
 
-
 def get_option_setter(model_name):
     """Return the static method <modify_commandline_options> of the model class."""
     model_class = find_model_using_name(model_name)
     return model_class.modify_commandline_options
-
 
 def create_model(opt):
     """Create a model given the option.
@@ -62,7 +57,8 @@ def create_model(opt):
         >>> from models import create_model
         >>> model = create_model(opt)
     """
-    model = find_model_using_name(opt.model)
+
+    model = find_model_using_name(opt.get_parameter("model"))
     instance = model(opt)
     print("model [%s] was created" % type(instance).__name__)
     return instance

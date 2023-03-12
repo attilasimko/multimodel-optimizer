@@ -62,7 +62,7 @@ class MayoClinicDataset(BaseDataset):
         parser.add_argument('--model_name', help="Model to use for training.", default='pix2pix')
         return parser
 
-    def __init__(self, opt):
+    def __init__(self, opt, phase):
         """Initialize this dataset class.
 
         Parameters:
@@ -74,12 +74,14 @@ class MayoClinicDataset(BaseDataset):
         self._path = self.opt.get_parameter("dataroot")
         self.lower = -1000
         self.upper = 2000
+        self.challenge_split = 'Training_Image_Data'
+        self.rec_kernel = '1mm B30'
         self.img_shape = self.opt.get_parameter("load_size")
-        self.plot_verbose = opt.plot_verbose
-        self.model_name = opt.model_name
+        self.plot_verbose = self.opt.get_parameter("plot_verbose")
+        self.model_name = self.opt.get_parameter("model")
 
         # Upload the annotations.
-        df = pd.read_csv(self._path, index_col=0)
+        df = pd.read_csv(os.path.join(self._path, f"{phase}-mayo-clinic.csv"), index_col=0)
         self.df_ld = df.loc[df['domain'] == 'LD'].reset_index(drop=True)
         self.df_hd = df.loc[df['domain'] == 'HD'].reset_index(drop=True)
         if len(self.df_ld) == 0 or len(self.df_hd) == 0:
@@ -91,7 +93,8 @@ class MayoClinicDataset(BaseDataset):
             raise IOError("Uncoupled dataset.")
 
         # Check Modalities.
-        self._modalities = util_general.parse_comma_separated_list(opt.modalities)
+        modalities = ''
+        self._modalities = util_general.parse_comma_separated_list("HD,LD")
         assert len(self._modalities) > 0
         self._mode_to_idx = {mode: i for i, mode in enumerate(self._modalities)}
         self._idx_to_mode = {i: mode for mode, i in self._mode_to_idx.items()}
@@ -135,6 +138,14 @@ class MayoClinicDataset(BaseDataset):
         elif self.model_name == 'srresnet':
             # ...
             # todo
+            raise NotImplementedError
+
+
+        if model == "srresnet":
+            return [A_transform, B_transform]
+        elif model == "pix2pix":
+            return {'A': A_transform, 'B': B_transform, 'A_paths': AB_path, 'B_paths': AB_path}
+        else:
             raise NotImplementedError
 
 
