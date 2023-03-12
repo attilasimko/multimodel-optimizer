@@ -162,7 +162,7 @@ def train(experiment, model, task, gen_train, gen_val):
     from tensorflow.config.experimental import get_device_details, get_memory_info
     from tensorflow.config import list_physical_devices
     import numpy as np
-    import utils_old
+    import utils_misc
     import time
     
     if (utils_old.memory_check(experiment, model) == False):

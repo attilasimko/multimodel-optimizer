@@ -23,7 +23,6 @@ def plot_img(x, pname):
     plt.axis('off')
     plt.show()
 
-
 def convert_hu_img(dicom_file):
     img = dicom_file.pixel_array
     intercept = dicom_file.RescaleIntercept
@@ -58,8 +57,6 @@ class MayoClinicDataset(BaseDataset):
             the modified parser.
         """
         parser.add_argument('--modalities', help="Dataset modalities", metavar="STRING", type=str, default="HD,LD")
-        parser.add_argument('--lower', help="Lower value for hu clip.",  type=int, default=-1024)
-        parser.add_argument('--upper', help="Upper value for hu clip.", type=int, default=2000)
         parser.add_argument('--img_shape', help="Image shape for resize.", type=int, default=256)
         parser.add_argument('--plot_verbose', help="Plot images.", type=bool, default=False)
         parser.add_argument('--model_name', help="Model to use for training.", default='pix2pix')

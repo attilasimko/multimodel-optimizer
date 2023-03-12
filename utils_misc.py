@@ -2,7 +2,7 @@ def setup_generators(experiment, task):
     import data
     
     data_path = get_dataset_path(experiment, task)
-    if (task == "sct"):
+    if task == "sct":
         input = "mr"
         output = "ct"
         gen_train = data.DataGenerator(data_path + "training/",
@@ -37,7 +37,7 @@ def memory_check(experiment, model):
     required_memory = get_TF_memory_usage(experiment.get_parameter("batch_size"), model) 
     experiment.log_parameter("reqmemory", required_memory)
 
-    if (required_memory > available_memory):
+    if required_memory > available_memory:
         print(f"ERROR: Not enough memory. Required: {required_memory} GB, Limit: {available_memory} GB")
         return False
     return True
@@ -80,24 +80,24 @@ def get_TF_memory_usage(batch_size, model):
 
 def get_dataset_path(experiment, task):
     import os
-    if (os.path.isdir('/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/')): # If running on my local machine
+    if os.path.isdir('/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/'): # If running on my local machine
         data_path = '/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/'
         experiment.log_parameter("server", "GERTY")
-    elif (os.path.isdir('/data_m2/lorenzo/data/')): # If running on laplace / gauss / neumann
+    elif os.path.isdir('/data_m2/lorenzo/data/'): # If running on laplace / gauss / neumann
         data_path = '/data_m2/lorenzo/data/'
         experiment.log_parameter("server", "laplace")
-    elif (os.path.isdir('/data/lorenzo/data/')): # If running on laplace / gauss / neumann
+    elif os.path.isdir('/data/lorenzo/data/'): # If running on laplace / gauss / neumann
         data_path = '/data/lorenzo/data/'
         experiment.log_parameter("server", "gauss")
     else:
         raise Exception("Unknown server")
 
-    if (task == "sct"):
+    if task == "sct":
         data_path += 'interim/Pelvis_2.1_repo_no_mask/Pelvis_2.1_repo_no_mask-num-375_train-0.70_val-0.20_test-0.10.zip'
-    elif (task == "transfer"):
+    elif task == "transfer":
         data_path += 'interim/brats/brats.zip'
-    elif (task== "denoise"):
-        data_path += 'raw/mayo-clinic/Training_Image_Data/1mm B30/full_1mm/'
+    elif task== "denoise":
+        data_path += 'raw/mayo-clinic/Training_Image_Data/1mm B30/'
     else:
         raise Exception("Unknown task")
     
@@ -109,13 +109,13 @@ def evaluate(experiment, model, gen, eval_type, task):
     
     loss_list = []
     for i, data in enumerate(gen):
-        if (task == "sct"):
+        if task == "sct":
             x_mri = np.expand_dims(data[0].numpy(), 3)
             x_ct = np.expand_dims(data[1].numpy(), 3)
             pred = model.predict_on_batch(x_mri)
             loss = 1000 * np.abs(pred - x_ct)[x_ct>-1]
             loss_list.extend(loss)
-        elif (task == "transfer"):
+        elif task == "transfer":
             x_t1 = np.expand_dims(data[0].numpy(), 3)
             x_t1ce = np.expand_dims(data[1].numpy(), 3)
             loss = model.test_on_batch(x_t1, x_t1ce)
@@ -128,7 +128,7 @@ def plot_results(experiment, model, gen):
     import numpy as np
     import matplotlib.pyplot as plt
     for i, data in enumerate(gen):
-        if (i % (len(gen) / 10) == 0):
+        if i % (len(gen) / 10) == 0:
             x = np.expand_dims(data[0].numpy(), 3)
             y = np.expand_dims(data[1].numpy(), 3)
             plt.figure(figsize=(12, 4))

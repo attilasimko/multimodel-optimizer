@@ -13,8 +13,6 @@ See our template dataset class 'template_dataset.py' for more details.
 import importlib
 import torch.utils.data
 from data.base_dataset import BaseDataset
-from data import brats_dataset
-
 
 def find_dataset_using_name(task):
     """Import the module "data/[dataset_name]_dataset.py".
@@ -24,11 +22,14 @@ def find_dataset_using_name(task):
     and it is case-insensitive.
     """
     
-    if (task == "sct"):
+    if task == "sct":
+        from data import pelvis_dataset
         dataset_name = "pelvis"
-    elif (task == "transfer"):
+    elif task == "transfer":
+        from data import brats_dataset
         dataset_name = "brats"
-    elif (task == "denoising"):
+    elif task == "denoising":
+        from data import mayoclinic_dataset
         dataset_name = "mayoclinic"
     else:
         raise NotImplementedError

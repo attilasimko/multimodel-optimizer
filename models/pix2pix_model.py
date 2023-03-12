@@ -1,7 +1,20 @@
 import torch
-from .base_model import BaseModel
+from . base_model import BaseModel
 from . import networks
 
+config = {
+        "algorithm": "bayes",
+        "name": "pix2pix",
+        "spec": {"maxCombo": 20, "objective": "minimize", "metric": "val_loss"},
+        "parameters": {
+            "lr": {"type": "float", "scalingType": "loguniform", "min": 0.00002, "max": 0.002},
+            "n_epochs": {"type": "integer", "min": 10, "max": 50},
+            "n_epochs_decay": {"type": "integer", "min": 10, "max": 50},
+            "gan_mode": {"type": "categorical", "values": ['lsgan', 'wgangp']},
+            "batch_size": {"type": "discrete", "values": [4, 8, 16]},
+        },
+        "trials": 1,
+}
 
 class Pix2PixModel(BaseModel):
     """ This class implements the pix2pix model, for learning a mapping from input images to output images given paired data.
