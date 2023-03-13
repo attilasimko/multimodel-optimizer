@@ -176,8 +176,8 @@ def train(experiment, model, task, gen_train, gen_val):
         tic = time.perf_counter()
         train_loss = []
         for i, data in enumerate(gen_train):
-            x = np.expand_dims(data[0].numpy(), 3)
-            y = np.expand_dims(data[1].numpy(), 3)
+            y = np.expand_dims(data[0].numpy(), 3)
+            x = np.expand_dims(data[1].numpy(), 3)
             loss = model.train_on_batch(x, y)
             train_loss.append(loss)
 

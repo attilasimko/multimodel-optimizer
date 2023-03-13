@@ -83,12 +83,12 @@ class PelvisDataset(BaseDataset):
         assert AB.shape == (len(self._modalities), self.opt.get_parameter("load_size"), self.opt.get_parameter("load_size"))
 
         # Select image A and B.
-        A = AB[self._mode_to_idx['MR_MR_T2'], :, :].astype("float32")  # MRI
-        B = AB[self._mode_to_idx['MR_nonrigid_CT'], :, :].astype("float32")  # CT
+        A = AB[self._mode_to_idx['MR_nonrigid_CT'], :, :].astype("float32")  # CT
+        B = AB[self._mode_to_idx['MR_MR_T2'], :, :].astype("float32")  # MRI
 
         # Perform transforms.
-        A_transform = self.transform_mr(A)
-        B_transform = self.transform_ct(B)
+        A_transform = self.transform_ct(A)
+        B_transform = self.transform_mr(B)
 
 
         model = self.opt.get_parameter("model")

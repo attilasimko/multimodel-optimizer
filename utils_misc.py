@@ -110,19 +110,19 @@ def evaluate(experiment, model, gen, eval_type, task):
     loss_list = []
     for i, data in enumerate(gen):
         if task == "sct":
-            x_mri = np.expand_dims(data[0].numpy(), 3)
-            x_ct = np.expand_dims(data[1].numpy(), 3)
+            x_ct = np.expand_dims(data[0].numpy(), 3)
+            x_mri = np.expand_dims(data[1].numpy(), 3)
             pred = model.predict_on_batch(x_mri)
             loss = 1000 * np.abs(pred - x_ct)[x_ct>-1]
             loss_list.extend(loss)
         elif task == "transfer":
-            x_t1 = np.expand_dims(data[0].numpy(), 3)
-            x_t1ce = np.expand_dims(data[1].numpy(), 3)
+            x_t1ce = np.expand_dims(data[0].numpy(), 3)
+            x_t1 = np.expand_dims(data[1].numpy(), 3)
             loss = model.test_on_batch(x_t1, x_t1ce)
             loss_list.extend(loss)
         elif task == "denoise":
-            x_lr = np.expand_dims(data[0].numpy(), 3)
-            x_hr = np.expand_dims(data[1].numpy(), 3)
+            x_hr = np.expand_dims(data[0].numpy(), 3)
+            x_lr = np.expand_dims(data[1].numpy(), 3)
             pred = model.predict_on_batch(x_lr)
             loss = 1000 * np.abs(pred - x_hr)
             loss_list.extend(loss)
@@ -138,8 +138,8 @@ def plot_results(experiment, model, gen):
     for i, data in enumerate(gen):
         if (plot_idx <= plot_num):
             plot_idx += 1
-            x = np.expand_dims(data[0].numpy(), 3)
-            y = np.expand_dims(data[1].numpy(), 3)
+            y = np.expand_dims(data[0].numpy(), 3)
+            x = np.expand_dims(data[1].numpy(), 3)
             plt.figure(figsize=(12, 4))
             plt.subplot(131)
             plt.imshow(x[0, :, :, 0], cmap='gray')

@@ -86,8 +86,8 @@ class BRATSDataset(BaseDataset):
         assert AB.shape == (len(self._modalities), self.opt.get_parameter("load_size"), self.opt.get_parameter("load_size"))
 
         # Select image A and B.
-        A = AB[self._mode_to_idx['t1'], :, :].astype("float32")  # T1
-        B = AB[self._mode_to_idx['t1ce'], :, :].astype("float32")  # T1ce
+        A = AB[self._mode_to_idx['t1ce'], :, :].astype("float32")  # T1ce
+        B = AB[self._mode_to_idx['t1'], :, :].astype("float32")  # T1
 
         # Perform transforms.
         A_transform = self.transform(A)
