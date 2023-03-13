@@ -133,8 +133,11 @@ def evaluate(experiment, model, gen, eval_type, task):
 def plot_results(experiment, model, gen):
     import numpy as np
     import matplotlib.pyplot as plt
+    plot_idx = 0
+    plot_num = 10
     for i, data in enumerate(gen):
-        if i % (len(gen) / 10) == 0:
+        if (plot_idx <= plot_num):
+            plot_idx += 1
             x = np.expand_dims(data[0].numpy(), 3)
             y = np.expand_dims(data[1].numpy(), 3)
             plt.figure(figsize=(12, 4))
