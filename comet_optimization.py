@@ -30,11 +30,12 @@ elif args.model == "diffusion":
     raise NotImplementedError # todo parameters diff salih
 else:
     raise Exception("Unknown model")
+log_comet = args.log_comet == "True"
 
 opt = comet_ml.Optimizer(config)
 
 experiment_idx = 0
-for experiment in opt.get_experiments(disabled=args.log_comet == "True"):
+for experiment in opt.get_experiments(disabled=log_comet):
     dataroot = utils_misc.get_dataset_path(experiment, args.task)
     experiment.set_name(f"{args.task}_{args.model}_{experiment_idx}")
     experiment_idx += 1
