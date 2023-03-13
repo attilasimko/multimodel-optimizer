@@ -30,7 +30,7 @@ elif args.model == "diffusion":
     raise NotImplementedError # todo parameters diff salih
 else:
     raise Exception("Unknown model")
-log_comet = args.log_comet == "True"
+log_comet = args.log_comet == "False"
 
 opt = comet_ml.Optimizer(config)
 
