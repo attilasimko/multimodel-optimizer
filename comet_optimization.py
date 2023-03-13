@@ -1,4 +1,5 @@
 import comet_ml
+comet_ml.init(api_key="ro9UfCMFS2O73enclmXbXfJJj", project_name='comet-optimizer', workspace="attilasimko")
 import utils_misc
 import argparse
 from data import create_dataset
@@ -7,11 +8,10 @@ from models import SRResNet
 from models import pix2pix_model
 from models import cycle_gan_model
 import os
-comet_ml.init(api_key="ro9UfCMFS2O73enclmXbXfJJj", project_name='comet-optimizer')
 
 parser = argparse.ArgumentParser(description='Welcome.')
 parser.add_argument("--gpu", default=None)
-parser.add_argument("--task", default="transfer") # sct / denoise / transfer
+parser.add_argument("--task", default="denoise") # sct / denoise / transfer
 parser.add_argument("--model", default="srresnet") # srresnet / pix2pix / cycle_gan / diffusion
 args = parser.parse_args()
 
@@ -42,7 +42,7 @@ for experiment in opt.get_experiments(disabled=True): # todo remove disabled
     experiment.log_parameter("load_size", 256)
     experiment.log_parameter("dataroot", dataroot)
     experiment.log_parameter("epochs", 10)
-    experiment.log_parameter("max_dataset_size", 500)
+    experiment.log_parameter("max_dataset_size", 50000)
     experiment.log_parameter("workers", 4)
     experiment.log_parameter("max_queue_size", 4)
     experiment.log_parameter("use_multiprocessing", "False")

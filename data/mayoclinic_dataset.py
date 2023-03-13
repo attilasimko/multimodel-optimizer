@@ -77,7 +77,7 @@ class MayoClinicDataset(BaseDataset):
         self.challenge_split = 'Training_Image_Data'
         self.rec_kernel = '1mm B30'
         self.img_shape = self.opt.get_parameter("load_size")
-        self.plot_verbose = self.opt.get_parameter("plot_verbose")
+        self.plot_verbose = self.opt.get_parameter("plot_verbose") == "True"
         self.model_name = self.opt.get_parameter("model")
 
         # Upload the annotations.
@@ -119,8 +119,8 @@ class MayoClinicDataset(BaseDataset):
         assert A_idslice == B_idslice
 
         # Load the Dicom.
-        A_dicom = pydicom.dcmread(A_paths)
-        B_dicom = pydicom.dcmread(B_paths)
+        A_dicom = pydicom.dcmread(self._path + "../../../" + A_paths)
+        B_dicom = pydicom.dcmread(self._path + "../../../" + B_paths)
 
         # Perform transforms.
         A_transform = self.transforms(A_dicom)
@@ -136,15 +136,7 @@ class MayoClinicDataset(BaseDataset):
             raise NotImplementedError
             # todo
         elif self.model_name == 'srresnet':
-            # ...
-            # todo
-            raise NotImplementedError
-
-
-        if model == "srresnet":
-            return [A_transform, B_transform]
-        elif model == "pix2pix":
-            return {'A': A_transform, 'B': B_transform, 'A_paths': AB_path, 'B_paths': AB_path}
+            return [A_transform[0, :, :], B_transform[0, :, :]]
         else:
             raise NotImplementedError
 

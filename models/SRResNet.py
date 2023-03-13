@@ -142,7 +142,7 @@ def build_TF_SRResNet(experiment, task, dropout_rate):
     x = Conv2D(num_filters, kernel_size=3, padding='same', activation='relu')(x)
 
     output = Conv2D(1, kernel_size=1, padding='same')(x)
-    if (task == "sct"):
+    if ((task == "sct") | (task == "denoise")):
         output = Activation(sct_range)(output)
     elif (task == "transfer"):
         output = Activation(znorm)(output)

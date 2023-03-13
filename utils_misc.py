@@ -80,8 +80,8 @@ def get_TF_memory_usage(batch_size, model):
 
 def get_dataset_path(experiment, task):
     import os
-    if os.path.isdir('/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/'): # If running on my local machine
-        data_path = '/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/'
+    if os.path.isdir('/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/data/'): # If running on my local machine
+        data_path = '/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/data/'
         experiment.log_parameter("server", "GERTY")
     elif os.path.isdir('/data_m2/lorenzo/data/'): # If running on laplace / gauss / neumann
         data_path = '/data_m2/lorenzo/data/'
@@ -119,6 +119,12 @@ def evaluate(experiment, model, gen, eval_type, task):
             x_t1 = np.expand_dims(data[0].numpy(), 3)
             x_t1ce = np.expand_dims(data[1].numpy(), 3)
             loss = model.test_on_batch(x_t1, x_t1ce)
+            loss_list.extend(loss)
+        elif task == "denoise":
+            x_lr = np.expand_dims(data[0].numpy(), 3)
+            x_hr = np.expand_dims(data[1].numpy(), 3)
+            pred = model.predict_on_batch(x_lr)
+            loss = 1000 * np.abs(pred - x_hr)
             loss_list.extend(loss)
 
     experiment.log_metrics({eval_type + "_loss": np.mean(loss_list)})
