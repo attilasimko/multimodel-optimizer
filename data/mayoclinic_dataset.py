@@ -119,8 +119,8 @@ class MayoClinicDataset(BaseDataset):
         assert A_idslice == B_idslice
 
         # Load the Dicom.
-        A_dicom = pydicom.dcmread(self._path + "../../../" + A_paths)
-        B_dicom = pydicom.dcmread(self._path + "../../../" + B_paths)
+        A_dicom = pydicom.dcmread(self._path + "../../../" + A_paths.replace("/raw/", "/interim/"))
+        B_dicom = pydicom.dcmread(self._path + "../../../" + B_paths.replace("/raw/", "/interim/"))
 
         # Perform transforms.
         A_transform = self.transforms(A_dicom)
