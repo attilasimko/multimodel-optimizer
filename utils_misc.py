@@ -97,7 +97,7 @@ def get_dataset_path(experiment, task):
     elif task == "transfer":
         data_path += 'interim/brats/brats.zip'
     elif task== "denoise":
-        data_path += 'raw/mayo-clinic/'
+        data_path += 'interim/mayo-clinic/'
     else:
         raise Exception("Unknown task")
     
