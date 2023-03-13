@@ -43,7 +43,7 @@ for experiment in opt.get_experiments(disabled=args.log_comet == "True"):
     experiment.log_parameter("load_size", 256)
     experiment.log_parameter("dataroot", dataroot)
     experiment.log_parameter("epochs", 10)
-    experiment.log_parameter("max_dataset_size", 50)
+    experiment.log_parameter("max_dataset_size", 10000)
     experiment.log_parameter("workers", 4)
     experiment.log_parameter("max_queue_size", 4)
     experiment.log_parameter("use_multiprocessing", "False")
