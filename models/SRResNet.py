@@ -172,7 +172,7 @@ def train(experiment, model, task, gen_train, gen_val):
     
     min_loss = np.inf
     patience = 0
-    patience_thr = 5
+    patience_thr = 20
     for epoch in range(experiment.get_parameter("epochs")):
         tic = time.perf_counter()
         train_loss = []
