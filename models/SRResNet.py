@@ -5,7 +5,7 @@ import math
 config = {
         "algorithm": "bayes",
         "name": "SRResNet",
-        "spec": {"maxCombo": 20, "objective": "minimize", "metric": "val_loss"},
+        "spec": {"maxCombo": 35, "objective": "minimize", "metric": "val_loss"},
         "parameters": {
             # "first_layer_units": {
             #     "type": "integer",
