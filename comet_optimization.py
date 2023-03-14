@@ -43,7 +43,7 @@ for experiment in opt.get_experiments(disabled=log_comet):
     experiment.log_parameter("model", args.model)
     experiment.log_parameter("load_size", 256)
     experiment.log_parameter("dataroot", dataroot)
-    experiment.log_parameter("epochs", 10)
+    experiment.log_parameter("epochs", 100)
     experiment.log_parameter("max_dataset_size", 1000000)
     experiment.log_parameter("workers", 4)
     experiment.log_parameter("max_queue_size", 4)
