@@ -83,11 +83,11 @@ def get_dataset_path(experiment, task):
     if os.path.isdir('/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/data/'): # If running on my local machine
         data_path = '/mnt/4a39cb60-7f1f-4651-81cb-029245d590eb/data/'
         experiment.log_parameter("server", "GERTY")
-    elif os.path.isdir('/data_m2/lorenzo/data/'): # If running on laplace / gauss / neumann
+    elif os.path.isdir('/data_m2/lorenzo/data/'): # If running on laplace
         data_path = '/data_m2/lorenzo/data/'
         experiment.log_parameter("server", "laplace")
-    elif os.path.isdir('/data/lorenzo/data/'): # If running on laplace / gauss / neumann
-        data_path = '/data/lorenzo/data/'
+    elif os.path.isdir('/data/attila/data/'): # If running on gauss
+        data_path = '/data/attila/data/'
         experiment.log_parameter("server", "gauss")
     else:
         raise Exception("Unknown server")
