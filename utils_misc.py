@@ -140,6 +140,10 @@ def plot_results(experiment, model, gen):
             plot_idx += 1
             y = np.expand_dims(data[0].numpy(), 3)
             x = np.expand_dims(data[1].numpy(), 3)
+            pred = model.predict_on_batch(x)
+            if experiment.get_parameter("task") == "denoise":
+                y = y - x
+                pred = pred - x
             plt.figure(figsize=(12, 4))
             plt.subplot(131)
             plt.imshow(x[0, :, :, 0], cmap='gray')
@@ -152,7 +156,7 @@ def plot_results(experiment, model, gen):
             plt.xticks([])
             plt.yticks([])
             plt.subplot(133)
-            plt.imshow(model.predict_on_batch(x)[0, :, :, 0], cmap='gray')
+            plt.imshow(pred[0, :, :, 0], cmap='gray')
             plt.colorbar()
             plt.xticks([])
             plt.yticks([])
