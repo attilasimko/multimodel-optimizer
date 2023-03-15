@@ -12,7 +12,7 @@ import os
 parser = argparse.ArgumentParser(description='Welcome.')
 parser.add_argument("--gpu", default=None)
 parser.add_argument("--log_comet", default="False")
-parser.add_argument("--task", default="denoise") # sct / denoise / transfer
+parser.add_argument("--task", default="transfer") # sct / denoise / transfer
 parser.add_argument("--model", default="srresnet") # srresnet / pix2pix / cycle_gan / diffusion
 args = parser.parse_args()
 
