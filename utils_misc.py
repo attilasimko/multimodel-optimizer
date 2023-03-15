@@ -114,7 +114,7 @@ def evaluate(experiment, model, gen, eval_type, task):
             x_mri = np.expand_dims(data[1].numpy(), 3)
             pred = model.predict_on_batch(x_mri)
             loss = 1000 * np.abs(pred - x_ct)[x_ct>-1]
-            loss_list.extend(np.mean(loss))
+            loss_list.extend([np.mean(loss)])
         elif task == "transfer":
             x_t1ce = np.expand_dims(data[0].numpy(), 3)
             x_t1 = np.expand_dims(data[1].numpy(), 3)
@@ -125,7 +125,7 @@ def evaluate(experiment, model, gen, eval_type, task):
             x_lr = np.expand_dims(data[1].numpy(), 3)
             pred = model.predict_on_batch(x_lr)
             loss = 1000 * np.abs(pred - x_hr)
-            loss_list.extend(np.mean(loss))
+            loss_list.extend([np.mean(loss)])
 
     experiment.log_metrics({eval_type + "_loss": np.mean(loss_list)})
     return np.mean(loss_list)
