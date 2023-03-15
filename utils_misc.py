@@ -141,9 +141,6 @@ def plot_results(experiment, model, gen):
             y = np.expand_dims(data[0].numpy(), 3)
             x = np.expand_dims(data[1].numpy(), 3)
             pred = model.predict_on_batch(x)
-            if experiment.get_parameter("task") == "denoise":
-                y = y - x
-                pred = pred - x
             plt.figure(figsize=(12, 4))
             plt.subplot(131)
             plt.imshow(x[0, :, :, 0], cmap='gray')

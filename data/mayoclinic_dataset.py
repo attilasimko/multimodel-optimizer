@@ -136,7 +136,7 @@ class MayoClinicDataset(BaseDataset):
             raise NotImplementedError
             # todo
         elif self.model_name == 'srresnet':
-            return [A_transform[0, :, :], B_transform[0, :, :]]
+            return [A_transform[0, :, :], B_transform[0, :, :] - A_transform[0, :, :]]
         else:
             raise NotImplementedError
 
