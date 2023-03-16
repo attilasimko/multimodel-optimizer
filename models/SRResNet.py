@@ -18,6 +18,7 @@ config = {
             "num_filters": {"type": "integer", "min": 32, "max": 64},
             "dropout_rate": {"type": "float", "min": 0.0, "max": 0.6},
             "batch_size": {"type": "discrete", "values": [4, 8]},
+            "epochs": 10
         },
         "trials": 1,
     }
