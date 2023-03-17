@@ -103,7 +103,7 @@ class BaseModel(ABC):
         """
         with torch.no_grad():
             self.forward()
-            self.compute_losses_eval()
+            # self.compute_losses_eval()
             self.compute_visuals()
 
     def compute_visuals(self):
@@ -113,6 +113,10 @@ class BaseModel(ABC):
     def get_image_paths(self):
         """ Return image paths that are used to load current data"""
         return self.image_paths
+
+    @abstractmethod
+    def get_net(self):
+        pass
 
     def update_learning_rate(self):
         """Update learning rates for all the networks; called at the end of every epoch"""

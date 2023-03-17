@@ -12,6 +12,7 @@ config = {
             "n_epochs_decay": {"type": "integer", "min": 10, "max": 50},
             "gan_mode": {"type": "categorical", "values": ['lsgan', 'wgangp', 'vanilla']},
             "batch_size": 16,
+            # todo add lambda1
         },
         "trials": 1,
 }
@@ -138,3 +139,6 @@ class Pix2PixModel(BaseModel):
         self.optimizer_G.zero_grad()        # set G's gradients to zero
         self.backward_G()                   # calculate graidents for G
         self.optimizer_G.step()             # udpate G's weights
+
+    def get_net(self):
+        return self.netG
