@@ -2,12 +2,15 @@ import comet_ml
 comet_ml.init(api_key="ro9UfCMFS2O73enclmXbXfJJj", project_name='comet-optimizer', workspace="attilasimko")
 import utils_misc
 import argparse
+
+import os
+import time
+
 from data import create_dataset
 from models import create_model
 from models import SRResNet
 from models import pix2pix_model
 from models import cycle_gan_model
-import os
 
 from options.train_options import TrainOptions
 
@@ -24,7 +27,7 @@ elif opt.model == "pix2pix":
 elif opt.model == "cycle_gan":
     raise NotImplementedError
 elif opt.model == "diffusion":
-    raise NotImplementedError # todo parameters diff salih
+    raise NotImplementedError
 else:
     raise Exception("Unknown model")
 log_comet = opt.log_comet == "False"
@@ -51,7 +54,6 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
     if opt.model == "srresnet":
         model = SRResNet.build_TF_SRResNet(experiment, opt.task, experiment.get_parameter('dropout_rate'))
     elif opt.model == "pix2pix":
-
         opt.lr = experiment.get_parameter('lr')
         opt.n_epochs = experiment.get_parameter('n_epochs')
         opt.n_epochs_decay = experiment.get_parameter('n_epochs_decay')
@@ -61,8 +63,8 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
         model = create_model(opt)  # create a model given opt.model and other options
         model.setup(opt)
     elif opt.model == "cycle_gan":
-        raise NotImplementedError # todo build cyclegan lorenzo
-    elif opt.model == "diffusion":  # todo build diff salih
+        raise NotImplementedError
+    elif opt.model == "diffusion":
         raise NotImplementedError
     else:
         raise Exception("Unknown model")
@@ -71,11 +73,29 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
     if opt.model == "srresnet":
         SRResNet.train(experiment, model, opt.task, gen_train, gen_val)
     elif opt.model == "pix2pix":
-        raise NotImplementedError # todo pix2pix training lorenzo
+        for epoch in range(opt.epoch_count, opt.n_epochs + opt.n_epochs_decay + 1):
+            epoch_start_time = time.time()  # timer for entire epoch
+
+            model.update_learning_rate()  # update learning rates in the beginning of every epoch.
+
+            for i, data in enumerate(gen_train):  # inner loop within one epoch
+                model.set_input(data)  # unpack data from dataset and apply preprocessing
+                model.optimize_parameters()  # calculate loss functions, get gradients, update network weights
+
+                losses = model.get_current_losses()
+
+            if epoch % opt.save_epoch_freq == 0:
+                print('saving the model at the end of epoch %d, iters %d' % (epoch, total_iters))
+                model.save_networks('latest')
+                model.save_networks(epoch)
+
+            print('End of epoch %d / %d \t Time Taken: %d sec' % (epoch, opt.n_epochs + opt.n_epochs_decay, time.time() - epoch_start_time))
+
+        raise NotImplementedError
     elif opt.model == "cycle_gan":
-        raise NotImplementedError # todo cyclegan training lorenzo
+        raise NotImplementedError
     elif opt.model == "diffusion":
-        raise NotImplementedError # todo diff training salih
+        raise NotImplementedError
     else:
         raise Exception("Unknown model")
 
