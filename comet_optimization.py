@@ -9,7 +9,7 @@ import numpy as np
 
 from data import create_dataset
 from models import create_model
-from models import SRResNet
+from models import srresnet_model
 from models import pix2pix_model
 from models import cycle_gan_model
 
@@ -22,7 +22,7 @@ if opt.gpu_ids is not None:
     os.environ["CUDA_VISIBLE_DEVICES"] = str(opt.gpu_ids)
 
 if opt.model == "srresnet":
-    config = SRResNet.config
+    config = srresnet_model.config
 elif opt.model == "pix2pix":
     config = pix2pix_model.config
 elif opt.model == "cycle_gan":
@@ -53,7 +53,7 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
 
     # Build the model
     if opt.model == "srresnet":
-        model = SRResNet.build_TF_SRResNet(experiment, opt.task, experiment.get_parameter('dropout_rate'))
+        model = srresnet_model.build_TF_SRResNet(experiment, opt.task, experiment.get_parameter('dropout_rate'))
     elif opt.model == "pix2pix":
         opt.lr = experiment.get_parameter('lr')
         opt.n_epochs = experiment.get_parameter('n_epochs')
@@ -72,7 +72,7 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
 
     # Train the model:
     if opt.model == "srresnet":
-        SRResNet.train(experiment, model, opt.task, gen_train, gen_val)
+        srresnet_model.train(experiment, model, opt.task, gen_train, gen_val)
     elif opt.model == "pix2pix":
         for epoch in range(opt.epoch_count, opt.n_epochs + opt.n_epochs_decay + 1):
             model.update_learning_rate()  # update learning rates in the beginning of every epoch.
