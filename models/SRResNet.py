@@ -3,9 +3,9 @@ import torch.nn as nn
 import math
 
 config = {
-        "algorithm": "bayes",
+        "algorithm": "random",
         "name": "SRResNet",
-        "spec": {"maxCombo": 35, "objective": "minimize", "metric": "val_loss"},
+        "spec": {"maxCombo": 50, "objective": "minimize", "metric": "val_loss"},
         "parameters": {
             # "first_layer_units": {
             #     "type": "integer",
@@ -13,12 +13,11 @@ config = {
             #     "sigma": 50,
             #     "scalingType": "normal",
             # },
-            "optimizer": "Adam",
+            "optimizer": {"type": "categorical", "values": ["Adam", "SGD", "RMSprop"]},
             "learning_rate": {"type": "float", "scalingType": "loguniform", "min": 0.0000001, "max": 0.0005},
             "num_filters": {"type": "integer", "min": 32, "max": 64},
             "dropout_rate": {"type": "float", "min": 0.0, "max": 0.6},
             "batch_size": {"type": "discrete", "values": [4, 8]},
-            "epochs": 10
         },
         "trials": 1,
     }
