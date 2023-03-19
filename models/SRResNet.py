@@ -13,7 +13,7 @@ config = {
             #     "sigma": 50,
             #     "scalingType": "normal",
             # },
-            "optimizer": {"type": "categorical", "values": ["Adam", "SGD", "RMSprop"]},
+            "optimizer": "Adam",
             "learning_rate": {"type": "float", "scalingType": "loguniform", "min": 0.0000001, "max": 0.0005},
             "num_filters": {"type": "integer", "min": 32, "max": 64},
             "dropout_rate": {"type": "float", "min": 0.0, "max": 0.6},
