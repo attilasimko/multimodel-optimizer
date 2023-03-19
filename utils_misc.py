@@ -110,20 +110,49 @@ def evaluate(experiment, model, gen, eval_type, task):
     loss_list = []
     for i, data in enumerate(gen):
         if task == "sct":
-            x_ct = np.expand_dims(data[0].numpy(), 3)
-            x_mri = np.expand_dims(data[1].numpy(), 3)
-            pred = model.predict_on_batch(x_mri)
+            if experiment.get_parameter('model') == "srresnet":
+                x_ct = np.expand_dims(data[0].numpy(), 3)
+                x_mri = np.expand_dims(data[1].numpy(), 3)
+                pred = model.predict_on_batch(x_mri)
+            elif experiment.get_parameter('model') == 'pix2pix':
+                model.eval()
+                model.set_input(data)  # unpack data from data loader
+                model.test()  # run inference
+                visuals = model.get_current_visuals()
+                x_ct = visuals['real_A'].detach().cpu().numpy()
+                pred = visuals['fake_B'].detach().cpu().numpy()
+            else:
+                raise NotImplementedError
             loss = 1000 * np.abs(pred - x_ct)[x_ct>-1]
             loss_list.extend([np.mean(loss)])
         elif task == "transfer":
-            x_t1ce = np.expand_dims(data[0].numpy(), 3)
-            x_t1 = np.expand_dims(data[1].numpy(), 3)
-            loss = model.test_on_batch(x_t1, x_t1ce)
+            if experiment.get_parameter('model') == "srresnet":
+                x_t1ce = np.expand_dims(data[0].numpy(), 3)
+                x_t1 = np.expand_dims(data[1].numpy(), 3)
+                loss = model.test_on_batch(x_t1, x_t1ce)
+            elif experiment.get_parameter('model') == 'pix2pix':
+                model.eval()
+                model.set_input(data)  # unpack data from data loader
+                model.test()  # run inference
+                losses = model.get_current_losses()
+                loss = losses['G_L1']
+            else:
+                raise NotImplementedError
             loss_list.extend(loss)
         elif task == "denoise":
-            x_hr = np.expand_dims(data[0].numpy(), 3)
-            x_lr = np.expand_dims(data[1].numpy(), 3)
-            pred = model.predict_on_batch(x_lr)
+            if experiment.get_parameter('model') == "srresnet":
+                x_hr = np.expand_dims(data[0].numpy(), 3)
+                x_lr = np.expand_dims(data[1].numpy(), 3)
+                pred = model.predict_on_batch(x_lr)
+            elif experiment.get_parameter('model') == 'pix2pix':
+                model.eval()
+                model.set_input(data)  # unpack data from data loader
+                model.test()  # run inference
+                visuals = model.get_current_visuals()
+                x_hr = visuals['real_A'].detach().cpu().numpy()
+                pred = visuals['fake_B'].detach().cpu().numpy()
+            else:
+                raise NotImplementedError
             loss = 1000 * np.abs(pred - x_hr)
             loss_list.extend([np.mean(loss)])
 
@@ -138,22 +167,39 @@ def plot_results(experiment, model, gen):
     for i, data in enumerate(gen):
         if (plot_idx <= plot_num):
             plot_idx += 1
-            y = np.expand_dims(data[0].numpy(), 3)
-            x = np.expand_dims(data[1].numpy(), 3)
-            pred = model.predict_on_batch(x)
+            if experiment.get_parameter('model') == "srresnet":
+                y = np.expand_dims(data[0].numpy(), 3)
+                x = np.expand_dims(data[1].numpy(), 3)
+                pred = model.predict_on_batch(x)
+                y_to_plot = y[0, :, :, 0]
+                x_to_plot = x[0, :, :, 0]
+                pred_to_plot = pred[0, :, :, 0]
+            elif experiment.get_parameter('model') == 'pix2pix':
+                model.eval()
+                model.set_input(data)  # unpack data from data loader
+                model.test()  # run inference
+                visuals = model.get_current_visuals()
+                y = visuals['real_A'].detach().cpu().numpy()
+                x = visuals['real_B'].detach().cpu().numpy()
+                pred = visuals['fake_B'].detach().cpu().numpy()
+                y_to_plot = y[0, 0, :, :]
+                x_to_plot = x[0, 0, :, :]
+                pred_to_plot = pred[0, 0, :, :]
+            else:
+                raise NotImplementedError
             plt.figure(figsize=(12, 4))
             plt.subplot(131)
-            plt.imshow(x[0, :, :, 0], cmap='gray')
+            plt.imshow(x_to_plot, cmap='gray')
             plt.colorbar()
             plt.xticks([])
             plt.yticks([])
             plt.subplot(132)
-            plt.imshow(y[0, :, :, 0], cmap='gray')
+            plt.imshow(y_to_plot, cmap='gray')
             plt.colorbar()
             plt.xticks([])
             plt.yticks([])
             plt.subplot(133)
-            plt.imshow(pred[0, :, :, 0], cmap='gray')
+            plt.imshow(pred_to_plot, cmap='gray')
             plt.colorbar()
             plt.xticks([])
             plt.yticks([])

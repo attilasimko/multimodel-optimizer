@@ -56,7 +56,7 @@ class MayoClinicDataset(BaseDataset):
         Returns:
             the modified parser.
         """
-        parser.add_argument('--modalities', help="Dataset modalities", metavar="STRING", type=str, default="HD,LD")
+        parser.add_argument('--modalities', help="Dataset modalities", metavar="STRING", type=str, default="full_1mm,quarter_1mm")
         parser.add_argument('--img_shape', help="Image shape for resize.", type=int, default=256)
         parser.add_argument('--plot_verbose', help="Plot images.", type=bool, default=False)
         parser.add_argument('--model_name', help="Model to use for training.", default='pix2pix')
@@ -94,7 +94,7 @@ class MayoClinicDataset(BaseDataset):
 
         # Check Modalities.
         modalities = ''
-        self._modalities = util_general.parse_comma_separated_list("HD,LD")
+        self._modalities = util_general.parse_comma_separated_list("full_1mm,quarter_1mm")
         assert len(self._modalities) > 0
         self._mode_to_idx = {mode: i for i, mode in enumerate(self._modalities)}
         self._idx_to_mode = {i: mode for mode, i in self._mode_to_idx.items()}
@@ -112,29 +112,30 @@ class MayoClinicDataset(BaseDataset):
             B_paths (str) - - image paths (same as A_paths)
         """
 
-        A_paths = self.df_hd['path_slice'].iloc[index] # High Dose
-        B_paths = self.df_ld['path_slice'].iloc[index] # Low Dose
+
+
+        A_paths = self.df_hd['partial_path'].iloc[index] # High Dose
+        B_paths = self.df_ld['partial_path'].iloc[index] # Low Dose
         A_idslice = util_path.get_filename(A_paths).split('.')[3]
         B_idslice = util_path.get_filename(B_paths).split('.')[3]
         assert A_idslice == B_idslice
 
         # Load the Dicom.
-        A_dicom = pydicom.dcmread(self._path + "../../../" + A_paths.replace("/raw/", "/interim/"))
-        B_dicom = pydicom.dcmread(self._path + "../../../" + B_paths.replace("/raw/", "/interim/"))
+        A_dicom = pydicom.dcmread(os.path.join(self._path, self.challenge_split, self.rec_kernel, self._modalities[0], A_paths)) # high-dose
+        B_dicom = pydicom.dcmread(os.path.join(self._path, self.challenge_split, self.rec_kernel, self._modalities[1], B_paths))# low-dose
 
         # Perform transforms.
         A_transform = self.transforms(A_dicom)
         B_transform = self.transforms(B_dicom)
 
         if self.plot_verbose:
-            plot_img(A_transform, pname='HD')
-            plot_img(B_transform, pname='LD')
+            plot_img(A_transform, pname='full_1mm')
+            plot_img(B_transform, pname='quarter_1mm')
 
-        if self.model_name == 'pix2pix':
+        if self.model_name == 'pix2pix' or self.model_name == 'cycle_gan':
             return  {'A': A_transform, 'B': B_transform, 'A_paths': A_paths, 'B_paths': B_paths}
         elif self.model_name == 'diffusion':
             raise NotImplementedError
-            # todo
         elif self.model_name == 'srresnet':
             return [A_transform[0, :, :] - B_transform[0, :, :], B_transform[0, :, :]]
         else:
@@ -151,9 +152,10 @@ class MayoClinicDataset(BaseDataset):
         x = clip_img(x, self.lower, self.upper)
         x = normalize_img(x, self.lower, self.upper)
         x = cv2.resize(x, (self.img_shape, self.img_shape))
+        x = x.astype("float32")
         if tensor_output:
             x = torch.from_numpy(x)
             x = x.unsqueeze(dim=0)
             return x
         else:
-            return x.astype('float32')
+            return x

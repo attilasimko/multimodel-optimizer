@@ -5,13 +5,14 @@ from . import networks
 config = {
         "algorithm": "bayes",
         "name": "pix2pix",
-        "spec": {"maxCombo": 20, "objective": "minimize", "metric": "val_loss"},
+        "spec": {"maxCombo": 35, "objective": "minimize", "metric": "val_loss"},
         "parameters": {
             "lr": {"type": "float", "scalingType": "loguniform", "min": 0.00002, "max": 0.002},
             "n_epochs": {"type": "integer", "min": 10, "max": 50},
             "n_epochs_decay": {"type": "integer", "min": 10, "max": 50},
-            "gan_mode": {"type": "categorical", "values": ['lsgan', 'wgangp']},
-            "batch_size": {"type": "discrete", "values": [4, 8, 16]},
+            "gan_mode": {"type": "categorical", "values": ['lsgan', 'wgangp', 'vanilla']},
+            "batch_size": 16,
+            # todo add lambda1
         },
         "trials": 1,
 }
@@ -138,3 +139,6 @@ class Pix2PixModel(BaseModel):
         self.optimizer_G.zero_grad()        # set G's gradients to zero
         self.backward_G()                   # calculate graidents for G
         self.optimizer_G.step()             # udpate G's weights
+
+    def get_net(self):
+        return self.netG
