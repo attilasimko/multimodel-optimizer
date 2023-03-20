@@ -19,7 +19,7 @@ opt = TrainOptions().parse()  # get options
 
 if opt.gpu_ids is not None:
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(opt.gpu_ids)
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(opt.gpu_ids[0])
 
 if opt.model == "srresnet":
     config = srresnet_model.config
