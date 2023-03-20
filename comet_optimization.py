@@ -53,7 +53,8 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
 
     # Build the model
     if opt.model == "srresnet":
-        model = srresnet_model.build_TF_SRResNet(experiment, opt.task, experiment.get_parameter('dropout_rate'))
+        experiment.log_parameter("epochs", 100)
+        model = srresnet_model.SRResNetModel.build_TF_SRResNet(experiment, opt.task, experiment.get_parameter('dropout_rate'))
     elif opt.model == "pix2pix":
         opt.lr = experiment.get_parameter('lr')
         opt.n_epochs = experiment.get_parameter('n_epochs')
@@ -72,7 +73,7 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
 
     # Train the model:
     if opt.model == "srresnet":
-        srresnet_model.train(experiment, model, opt.task, gen_train, gen_val)
+        srresnet_model.SRResNetModel.train(experiment, model, opt.task, gen_train, gen_val)
     elif opt.model == "pix2pix":
         for epoch in range(opt.epoch_count, opt.n_epochs + opt.n_epochs_decay + 1):
             model.update_learning_rate()  # update learning rates in the beginning of every epoch.
