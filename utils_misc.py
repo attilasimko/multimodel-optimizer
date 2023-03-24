@@ -25,21 +25,21 @@ def setup_generators(experiment, task):
     return gen_train, gen_val, gen_test
 
 def memory_check(experiment, model):
-    import nvidia_smi
-    import numpy as np
+    # import nvidia_smi
+    # import numpy as np
 
-    nvidia_smi.nvmlInit()
-    handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
-    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
-    available_memory = np.round(info.total / (1024.0 ** 3), 3) # We could just hard-set this to 10GB. That's the limit on the smallest GPUs we have.
-    nvidia_smi.nvmlShutdown()
+    # nvidia_smi.nvmlInit()
+    # handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0)
+    # info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+    # available_memory = np.round(info.total / (1024.0 ** 3), 3) # We could just hard-set this to 10GB. That's the limit on the smallest GPUs we have.
+    # nvidia_smi.nvmlShutdown()
 
-    required_memory = get_TF_memory_usage(experiment.get_parameter("batch_size"), model) 
-    experiment.log_parameter("reqmemory", required_memory)
+    # required_memory = get_TF_memory_usage(experiment.get_parameter("batch_size"), model) 
+    # experiment.log_parameter("reqmemory", required_memory)
 
-    if required_memory > available_memory:
-        print(f"ERROR: Not enough memory. Required: {required_memory} GB, Limit: {available_memory} GB")
-        return False
+    # if required_memory > available_memory:
+    #     print(f"ERROR: Not enough memory. Required: {required_memory} GB, Limit: {available_memory} GB")
+    #     return False
     return True
 
 def get_TF_memory_usage(batch_size, model):
