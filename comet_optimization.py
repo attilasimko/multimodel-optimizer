@@ -54,6 +54,8 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
     # Build the model
     if opt.model == "srresnet":
         experiment.log_parameter("epochs", 100)
+        if (opt.task == "transfer"):
+            experiment.log_parameter("epochs", 15)
         model = srresnet_model.SRResNetModel.build_TF_SRResNet(experiment, opt.task, experiment.get_parameter('dropout_rate'))
     elif opt.model == "pix2pix":
         opt.lr = experiment.get_parameter('lr')
