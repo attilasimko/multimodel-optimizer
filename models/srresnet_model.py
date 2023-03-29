@@ -4,7 +4,7 @@ from . base_model import BaseModel
 import math
 
 config = {
-        "algorithm": "random",
+        "algorithm": "bayes",
         "name": "SRResNet",
         "spec": {"maxCombo": 50, "objective": "minimize", "metric": "val_loss"},
         "parameters": {
