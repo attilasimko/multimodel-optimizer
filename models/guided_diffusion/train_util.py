@@ -80,9 +80,9 @@ class TrainLoop:
 
         self.step = 0
         self.resume_step = 0
-        self.global_batch = self.batch_size * dist.get_world_size()
+        self.global_batch = self.batch_size# * dist.get_world_size()
 
-        self.sync_cuda = th.cuda.is_available()
+        # self.sync_cuda = th.cuda.is_available()
 
         self._load_and_sync_parameters()
         self.mp_trainer = MixedPrecisionTrainer(
@@ -189,7 +189,8 @@ class TrainLoop:
             self.run_step(batch, cond)
         
             i += 1
-          
+            
+            
             if self.step % self.log_interval == 0:
                 logger.dumpkvs()
             if self.step % self.save_interval == 0:

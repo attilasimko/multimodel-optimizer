@@ -121,6 +121,12 @@ def evaluate(experiment, model, gen, eval_type, task):
                 visuals = model.get_current_visuals()
                 x_ct = visuals['real_A'].detach().cpu().numpy()
                 pred = visuals['fake_B'].detach().cpu().numpy()
+            elif experiment.get_parameter('model') == 'diffusion':
+                from models.diffusion_model import predict_on_batch
+                pred = predict_on_batch(experiment, model, data[1])
+                x_ct = np.expand_dims(np.squeeze(data[0].numpy()), 3)
+                x_mri = np.expand_dims(np.squeeze(data[1].numpy()), 3)
+                pred = np.expand_dims(pred, 3)
             else:
                 raise NotImplementedError
             loss = 1000 * np.abs(pred - x_ct)[x_ct>-1]
@@ -136,6 +142,13 @@ def evaluate(experiment, model, gen, eval_type, task):
                 model.test()  # run inference
                 losses = model.get_current_losses()
                 loss = losses['G_L1']
+            elif experiment.get_parameter('model') == 'diffusion':
+                from models.diffusion_model import predict_on_batch
+                pred = predict_on_batch(experiment, model, data[1])
+                x_t1ce = np.expand_dims(np.squeeze(data[0].numpy()), 3)
+                x_t1 = np.expand_dims(np.squeeze(data[1].numpy()), 3)
+                pred = np.expand_dims(pred, 3)
+                loss = np.abs(pred - x_t1ce)
             else:
                 raise NotImplementedError
             loss_list.extend(loss)
@@ -151,6 +164,12 @@ def evaluate(experiment, model, gen, eval_type, task):
                 visuals = model.get_current_visuals()
                 x_hr = visuals['real_A'].detach().cpu().numpy()
                 pred = visuals['fake_B'].detach().cpu().numpy()
+            elif experiment.get_parameter('model') == 'diffusion':
+                from models.diffusion_model import predict_on_batch
+                pred = predict_on_batch(experiment, model, data[1])
+                x_hr = np.expand_dims(np.squeeze(data[0].numpy()), 3)
+                x_lr = np.expand_dims(np.squeeze(data[1].numpy()), 3)
+                pred = np.expand_dims(pred, 3)
             else:
                 raise NotImplementedError
             loss = 1000 * np.abs(pred - x_hr)
@@ -185,6 +204,14 @@ def plot_results(experiment, model, gen):
                 y_to_plot = y[0, 0, :, :]
                 x_to_plot = x[0, 0, :, :]
                 pred_to_plot = pred[0, 0, :, :]
+            elif experiment.get_parameter('model') == 'diffusion':
+                from models.diffusion_model import predict_on_batch
+                pred = predict_on_batch(experiment, model, data[1])
+                y = np.expand_dims(data[0].numpy(), 3)
+                x = np.expand_dims(data[1].numpy(), 3)
+                y_to_plot = np.squeeze(y[0, :, :, 0])
+                x_to_plot = np.squeeze(x[0, :, :, 0])
+                pred_to_plot = pred[0, :, :]
             else:
                 raise NotImplementedError
             plt.figure(figsize=(12, 4))

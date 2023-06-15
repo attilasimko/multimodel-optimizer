@@ -96,6 +96,8 @@ class PelvisDataset(BaseDataset):
             return [A_transform, B_transform]
         elif model == "pix2pix":
             return {'A': A_transform, 'B': B_transform, 'A_paths': AB_path, 'B_paths': AB_path}
+        elif model == "diffusion":
+            return (A_transform[None, ...], B_transform[None, ...])
 
     def transform_mr(self, img):
         img = img - np.mean(img)

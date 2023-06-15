@@ -95,7 +95,7 @@ def main():
             )
             sample, x_noisy, org = sample_fn(
                 model,
-                (args.batch_size, 2, args.image_size, args.image_size), img,
+                (args.batch_size, 3, args.image_size, args.image_size), img,
                 clip_denoised=args.clip_denoised,
                 progress=False,
                 model_kwargs=model_kwargs,

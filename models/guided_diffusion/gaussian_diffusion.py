@@ -259,10 +259,9 @@ class GaussianDiffusion:
         C=1
         assert t.shape == (B,)
         model_output = model(x, self._scale_timesteps(t), **model_kwargs)
+        model_output, model_var_values = th.split(model_output, C, dim=1)
         x=x[:,-1:,...]  #loss is only calculated on the last channel, not on the input brain MR image
         if self.model_var_type in [ModelVarType.LEARNED, ModelVarType.LEARNED_RANGE]:
-            assert model_output.shape == (B, C * 2, *x.shape[2:])
-            model_output, model_var_values = th.split(model_output, C, dim=1)
             if self.model_var_type == ModelVarType.LEARNED:
                 model_log_variance = model_var_values
                 model_variance = th.exp(model_log_variance)
@@ -519,6 +518,7 @@ class GaussianDiffusion:
         for sample in self.p_sample_loop_progressive(
             model,
             shape,
+            time=10,
             noise=x_noisy,
             clip_denoised=clip_denoised,
             denoised_fn=denoised_fn,
@@ -555,6 +555,7 @@ class GaussianDiffusion:
         p_sample().
         """
 
+
         if device is None:
             device = next(model.parameters()).device
         assert isinstance(shape, (tuple, list))
@@ -578,7 +579,7 @@ class GaussianDiffusion:
                 #viz.image(visualize(img.cpu()[0, -1,...]), opts=dict(caption="sample"+ str(i) ))
 
             with th.no_grad():
-                if img.shape != (1, 2, 256, 256):  
+                if img.shape[1:] != (2, 256, 256):  
                     img = torch.cat((org_MRI,img), dim=1)       #in every step, make sure to concatenate the original image to the sampled segmentation mask
                     
                 out = self.p_sample(

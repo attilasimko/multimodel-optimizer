@@ -2,6 +2,9 @@ import comet_ml
 comet_ml.init(api_key="ro9UfCMFS2O73enclmXbXfJJj", project_name='comet-optimizer', workspace="attilasimko")
 import utils_misc
 import argparse
+import sys
+sys.path.append("..")
+sys.path.append(".")
 
 import os
 import time
@@ -12,6 +15,7 @@ from models import create_model
 from models import srresnet_model
 from models import pix2pix_model
 from models import cycle_gan_model
+from models import diffusion_model
 
 from options.train_options import TrainOptions
 
@@ -28,7 +32,7 @@ elif opt.model == "pix2pix":
 elif opt.model == "cycle_gan":
     raise NotImplementedError
 elif opt.model == "diffusion":
-    raise NotImplementedError
+    config = diffusion_model.config
 else:
     raise Exception("Unknown model")
 log_comet = opt.log_comet == "False"
@@ -40,6 +44,7 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
     dataroot = utils_misc.get_dataset_path(experiment, opt.task)
     experiment.set_name(f"{opt.task}_{opt.model}_{experiment_idx}")
     experiment_idx += 1
+    experiment.log_parameter("gpu", opt.gpu_ids[0])
     experiment.log_parameter("task", opt.task)
     experiment.log_parameter("model", opt.model)
     experiment.log_parameter("dataroot", dataroot)
@@ -69,7 +74,7 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
     elif opt.model == "cycle_gan":
         raise NotImplementedError
     elif opt.model == "diffusion":
-        raise NotImplementedError
+        model = diffusion_model.DiffusionModel.build_model(experiment, opt.task)
     else:
         raise Exception("Unknown model")
 
@@ -83,11 +88,6 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
             tic = time.perf_counter()
             train_l1loss = []
             for i, data in enumerate(gen_train):
-                # inner loop within one epoch
-
-                #if i > 5:
-                #    break
-
                 model.set_input(data)  # unpack data from dataset and apply preprocessing
                 model.optimize_parameters()  # calculate loss functions, get gradients, update network weights
                 losses = model.get_current_losses()
@@ -105,7 +105,7 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
     elif opt.model == "cycle_gan":
         raise NotImplementedError
     elif opt.model == "diffusion":
-        raise NotImplementedError
+        diffusion_model.DiffusionModel.train(experiment, model, gen_train)
     else:
         raise Exception("Unknown model")
 

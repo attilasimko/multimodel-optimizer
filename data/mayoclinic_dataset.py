@@ -135,7 +135,7 @@ class MayoClinicDataset(BaseDataset):
         if self.model_name == 'pix2pix' or self.model_name == 'cycle_gan':
             return  {'A': A_transform, 'B': B_transform, 'A_paths': A_paths, 'B_paths': B_paths}
         elif self.model_name == 'diffusion':
-            raise NotImplementedError
+            return (A_transform[None, ...], B_transform[None, ...])
         elif self.model_name == 'srresnet':
             return [A_transform[0, :, :] - B_transform[0, :, :], B_transform[0, :, :]]
         else:

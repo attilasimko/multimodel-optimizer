@@ -100,7 +100,7 @@ class BRATSDataset(BaseDataset):
         elif model == "pix2pix":
             return {'A': A_transform, 'B': B_transform, 'A_paths': AB_path, 'B_paths': AB_path}
         else:
-            raise NotImplementedError
+            return (A_transform[None, ...], B_transform[None, ...])
 
     def transform(self, img):
         img = img - np.mean(img)
