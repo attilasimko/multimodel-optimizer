@@ -38,23 +38,16 @@ def predict_on_batch(exp, models, x):
     c = th.randn_like(x[:, :1, ...])
     img = th.cat((x, c), dim=1)  #add a noise channel
 
-    for i in tqdm(range(1)):  #this is for the generation of an ensemble of 5 masks.
-        model_kwargs = { }
-        sample_fn = diffusion.p_sample_loop_known
-        sample, x_noisy, org = sample_fn(
-            model,
-            (exp.get_parameter('batch_size'), 2, im_size, im_size), img,
-            clip_denoised=False,
-            model_kwargs=model_kwargs,
-        )
-        # print('time for 1 sample', start.elapsed_time(end))  #time measurement for the generation of 1 sample
-
-        if i == 0:
-            s = th.tensor(sample)
-        else:
-            s = th.cat((s, sample), 1)
+    model_kwargs = { }
+    sample_fn = diffusion.p_sample_loop_known
+    sample, x_noisy, org = sample_fn(
+        model,
+        (exp.get_parameter('batch_size'), 2, im_size, im_size), img,
+        clip_denoised=False,
+        model_kwargs=model_kwargs,
+    )
                 
-    return np.mean(s.numpy(), 1)
+    return np.mean(th.tensor(sample).numpy(), 1)
 
 class DiffusionModel(BaseModel):
     def create_argparser():
