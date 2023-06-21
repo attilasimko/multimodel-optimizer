@@ -50,7 +50,7 @@ def predict_on_batch(exp, models, x):
     return np.mean(th.tensor(sample).numpy(), 1)
 
 class DiffusionModel(BaseModel):
-    def create_argparser(parser):
+    def create_argparser():
         defaults = dict(
         data_dir="/home/lorenzo/data/interim",
         img_size=256,
@@ -71,12 +71,12 @@ class DiffusionModel(BaseModel):
         gpu=2,
         )
         defaults.update(model_and_diffusion_defaults())
-        # parser = argparse.ArgumentParser()
+        parser = argparse.ArgumentParser()
         add_dict_to_argparser(parser, defaults)
         return parser
 
-    def build_model(exp, task, parser):
-        args = DiffusionModel.create_argparser(parser).parse_args()
+    def build_model(exp, task):
+        args = DiffusionModel.create_argparser().parse_args()
         model, diffusion = create_model_and_diffusion(
         **args_to_dict(args, model_and_diffusion_defaults().keys())
         )

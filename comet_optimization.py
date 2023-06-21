@@ -74,7 +74,7 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
     elif opt.model == "cycle_gan":
         raise NotImplementedError
     elif opt.model == "diffusion":
-        model = diffusion_model.DiffusionModel.build_model(experiment, opt.task, opt)
+        model = diffusion_model.DiffusionModel.build_model(experiment, opt.task)
     else:
         raise Exception("Unknown model")
 
