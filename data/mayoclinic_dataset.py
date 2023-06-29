@@ -155,7 +155,7 @@ class MayoClinicDataset(BaseDataset):
         x = x.astype("float32")
         if tensor_output:
             x = torch.from_numpy(x)
-            x = x.unsqueeze(dim=0)
+            # x = x.unsqueeze(dim=0)
             return x
         else:
             return x
