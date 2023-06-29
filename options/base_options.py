@@ -77,7 +77,7 @@ class BaseOptions():
 
         # save and return the parser
         self.parser = parser
-        return parser.parse_args()
+        return parser
 
     def print_options(self, opt):
         """Print and save options
@@ -106,7 +106,8 @@ class BaseOptions():
 
     def parse(self):
         """Parse our options, create checkpoints directory suffix, and set up gpu device."""
-        opt = self.gather_options()
+        parser = self.gather_options()
+        opt = parser.parse_args()
         opt.isTrain = self.isTrain   # train or test
 
         # process opt.suffix
@@ -127,4 +128,4 @@ class BaseOptions():
         #     torch.cuda.set_device(opt.gpu_ids[0])
 
         self.opt = opt
-        return self.opt
+        return self.opt, parser

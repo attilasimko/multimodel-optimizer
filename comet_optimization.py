@@ -19,8 +19,7 @@ from models import diffusion_model
 
 from options.train_options import TrainOptions
 
-parser = TrainOptions()
-opt = TrainOptions().parse()  # get options
+opt, parser = TrainOptions().parse()  # get options
 
 if opt.gpu_ids is not None:
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"

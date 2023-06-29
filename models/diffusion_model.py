@@ -57,10 +57,10 @@ class DiffusionModel(BaseModel):
         schedule_sampler="uniform",
         save_prefix="XXXX",
         sample_step=None, #Sample and save an image at this step
-        lr=1e-4,
+        # lr=1e-4,
         weight_decay=0.0,
         lr_anneal_steps=100000,
-        batch_size=1,
+        # batch_size=1,
         microbatch=-1,  # -1 disables microbatches
         ema_rate="0.9999",  # comma-separated list of EMA values
         log_interval=100,
@@ -71,6 +71,7 @@ class DiffusionModel(BaseModel):
         gpu=2,
         )
         defaults.update(model_and_diffusion_defaults())
+        # parser = argparse.ArgumentParser()
         add_dict_to_argparser(parser, defaults)
         return parser
 
