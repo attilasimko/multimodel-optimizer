@@ -19,6 +19,7 @@ from models import diffusion_model
 
 from options.train_options import TrainOptions
 
+parser = TrainOptions()
 opt = TrainOptions().parse()  # get options
 
 if opt.gpu_ids is not None:
@@ -74,40 +75,40 @@ for experiment in opt_comet.get_experiments(disabled=log_comet):
     elif opt.model == "cycle_gan":
         raise NotImplementedError
     elif opt.model == "diffusion":
-        model = diffusion_model.DiffusionModel.build_model(experiment, opt.task)
+        model = diffusion_model.DiffusionModel.build_model(experiment, opt.task, parser)
     else:
         raise Exception("Unknown model")
 
-    # # Train the model:
-    # if opt.model == "srresnet":
-    #     srresnet_model.SRResNetModel.train(experiment, model, opt.task, gen_train, gen_val)
-    # elif opt.model == "pix2pix":
-    #     for epoch in range(opt.epoch_count, opt.n_epochs + opt.n_epochs_decay + 1):
-    #         model.update_learning_rate()  # update learning rates in the beginning of every epoch.
+    # Train the model:
+    if opt.model == "srresnet":
+        srresnet_model.SRResNetModel.train(experiment, model, opt.task, gen_train, gen_val)
+    elif opt.model == "pix2pix":
+        for epoch in range(opt.epoch_count, opt.n_epochs + opt.n_epochs_decay + 1):
+            model.update_learning_rate()  # update learning rates in the beginning of every epoch.
 
-    #         tic = time.perf_counter()
-    #         train_l1loss = []
-    #         for i, data in enumerate(gen_train):
-    #             model.set_input(data)  # unpack data from dataset and apply preprocessing
-    #             model.optimize_parameters()  # calculate loss functions, get gradients, update network weights
-    #             losses = model.get_current_losses()
-    #             train_l1loss.append(losses['G_L1'])
+            tic = time.perf_counter()
+            train_l1loss = []
+            for i, data in enumerate(gen_train):
+                model.set_input(data)  # unpack data from dataset and apply preprocessing
+                model.optimize_parameters()  # calculate loss functions, get gradients, update network weights
+                losses = model.get_current_losses()
+                train_l1loss.append(losses['G_L1'])
 
-    #         toc = time.perf_counter()
-    #         experiment.log_metrics({"training_loss": np.mean(train_l1loss), "epoch_time [s]": toc - tic}, epoch=epoch)
+            toc = time.perf_counter()
+            experiment.log_metrics({"training_loss": np.mean(train_l1loss), "epoch_time [s]": toc - tic}, epoch=epoch)
 
-    #         if epoch % opt.save_epoch_freq == 0:
-    #             print('saving the model at the end of epoch %d' % epoch)
-    #             model.save_networks('latest')
-    #             model.save_networks(epoch)
+            if epoch % opt.save_epoch_freq == 0:
+                print('saving the model at the end of epoch %d' % epoch)
+                model.save_networks('latest')
+                model.save_networks(epoch)
 
-    #         print('End of epoch %d / %d \t Time Taken: %d sec' % (epoch, opt.n_epochs + opt.n_epochs_decay, toc - tic))
-    # elif opt.model == "cycle_gan":
-    #     raise NotImplementedError
-    # elif opt.model == "diffusion":
-    #     diffusion_model.DiffusionModel.train(experiment, model, gen_train)
-    # else:
-    #     raise Exception("Unknown model")
+            print('End of epoch %d / %d \t Time Taken: %d sec' % (epoch, opt.n_epochs + opt.n_epochs_decay, toc - tic))
+    elif opt.model == "cycle_gan":
+        raise NotImplementedError
+    elif opt.model == "diffusion":
+        diffusion_model.DiffusionModel.train(experiment, model, gen_train)
+    else:
+        raise Exception("Unknown model")
 
     # How well did it do?
     utils_misc.plot_results(experiment, model, gen_val)
